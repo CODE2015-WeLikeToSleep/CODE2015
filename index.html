@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+    <title>Healthy Voting</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <style type="text/css">
+    html {
+      margin: 0;
+      padding-top: 0;
+    }
+
+    .leaves {
+      background: url('leaves.jpeg') no-repeat center center;
+      color: white;
+      margin-bottom: 2em;
+    }
+
+    .canyon {
+      background: url('canyon.jpg') no-repeat center center;
+      color: white;
+      margin-bottom: 2em;
+    }
+
+    </style>
+  </head>
+
+  <body>
+
+    <div class="container-fluid">
+
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Healthy Voting</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li><a href="#browse">Bils/Votes about Healthy Living</a></li>
+              <li><a href="#representation">What is Proportional Representation</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="#aboutCODE">CODE 2015</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="row leaves" style="padding: 70px;">
+        <h1>Healthy Voting</h1>
+        <p>Healthy living is important to you. Is it important to your elected representatives? What bills are being passed or failed? Would the results change in a different electoral system?</p>
+        <p>
+          <a class="btn btn-lg btn-primary" href="#browse" role="button">See Bills and Votes &raquo;</a>
+        </p>
+      </div>
+
+      <div class="" id="browse" style="height: 400px;">
+        <a class="anchor" name="browse"></a>
+
+<div style="border:1px solid black; display: block; width: 300px; margin-bottom: 1em;">
+  show the arrangement of actual and hypothetical parliament
+  based on current selection of parliament
+</div>
+
+Parliament/Session
+<select id="parl_session">
+  <option value="41,2">41st Parliament, 2nd Session</option>
+  <option value="41,1">41st Parliament, 1st Session</option>
+  <option value="40,3">40th Parliament, 3rd Session</option>
+  <option value="40,2">40th Parliament, 2nd Session</option>
+  <!-- the 40th parliament, 1st session is dumb and has no real bills. -->
+  <!--<option value="40,1">40th Parliament, 1st Session</option>-->
+  <option value="39,2">39th Parliament, 2nd Session</option>
+  <option value="39,1">39th Parliament, 1st Session</option>
+</select>
+
+Vote
+<select id="votelist">
+</select>
+<a id="lnkPrev" href="#">Previous</a>
+<a id="lnkNext" href="#">Next</a>
+
+<br>
+
+<span id="billdesc">No description</span>
+<svg id="chart1" class="chart"></svg>
+<svg id="chart2" class="chart"></svg>
+
+      </div>
+
+      <div class="row canyon" id="representation" style="height: 400px;">
+        <a class="anchor" name="representation"></a>
+        representation
+      </div>
+
+      <div class="" id="aboutCODE" style="height: 400px;">
+        <a class="anchor" name="aboutCODE"></a>
+
+        <img src="code_header.png" style="float: right;" />
+
+        <p>This is a project submission for the 2015 <a href="http://open.canada.ca/en/canadian-open-data-experience-code">Canadian Open Data Experience</a>.</p>
+
+        <p>relation to theme of 'healthy living'?</p>
+
+        <p>open data sets?</p>
+
+        <p><a href="http://www.parl.gc.ca/HouseChamberBusiness/ChamberVoteList.aspx?Language=E&Mode=1&Parl=41&Ses=2">
+          House of Commons, Parliamentary Business
+        </a></p>
+
+        <p>innovation?</p>
+      </div>
+
+    </div> <!-- /container -->
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script src="voting.js"></script>
+<script>
+function populateVoteListing(parliament, session) {
+  function doPopulateVoteListing(voteListing) {
+    $('#votelist').empty();
+    $.each(voteListing, function(index, value) {
+        $('#votelist').append($('<option/>', { 
+            value: value.voteNumber,
+            text : value.bill,
+        }));
+    });
+  }
+
+  // TODO: ask Neil about a better approach for lazy ajax fetch followed by acting on an object.
+  // especially when I'm going to work with that object in multiple places. write checking code everywhere?
+  // Neil says: yeah, check undefined, but keep one copy of the jQuery get and hang everything off of that. nice!
+  // Alright, then how do I handle cache invalidations? probably the easiest way is to not do cache invalidation,
+  // and just have an in-memory namespace. use the URL as the cache key.
+  // Maybe I need to read about promises.
+  var fetchUrl = 'data/parl'+parliament+'_sess'+session+'.xml';
+  if (typeof cachedVoteListing[fetchUrl] != "undefined") {
+    console.log('using cached version');
+    doPopulateVoteListing(cachedVoteListing[fetchUrl]);
+  } else {
+    $.ajax({
+      type : 'GET',
+      url : fetchUrl,
+      success : function(dataXML){
+        cachedVoteListing[fetchUrl] = voteListingFromXml(dataXML);
+        doPopulateVoteListing(cachedVoteListing[fetchUrl]);
+      },
+    });
+  }
+}
+
+function populateCharts(parliament, session, vote) {
+  $.ajax({
+    type : 'GET',
+    url : 'data/parl'+parliament+'_sess'+session+'_vote'+vote+'.xml',
+    success : function(dataXML){
+      var data = voteJsonFromVoteXml(dataXML);
+      var partyVotes = summarizeVotesByParty(data);
+        appendParliamentRatios(alternateParliament);
+      var parlForVote = parliamentFromVotes(partyVotes);
+        appendParliamentRatios(parlForVote);
+      var rescaledVote = scaleVote(partyVotes, alternateParliament);
+
+      renderPieVoteSummary('#chart1', partyVotes);
+      renderPieVoteSummary('#chart2', rescaledVote);
+    },
+    error : function(){
+      //error handler..
+    }
+  });
+
+}
+
+$( document ).ready(function() {
+  populateVoteListing(41, 2);
+  populateCharts(41, 1, 1);
+
+  $('select#parl_session').change(function(){
+    var keys = $(this).val().split(',');
+    var parliament = keys[0];
+    var session = keys[1];
+    populateVoteListing(parliament, session);
+  });
+  $('select#votelist').change(function(){
+    // TODO: wow, this is so hackish.
+    var keys = $('#parl_session').val().split(',');
+    var parliament = keys[0];
+    var session = keys[1];
+    var vote = $(this).val();
+    populateCharts(parliament, session, vote);
+  });
+
+  $('#lnkNext').click(function() {
+    $('#votelist > option:selected')
+      .prop('selected', false)
+      .next()
+      .prop('selected', true);
+    $('#votelist').trigger('change');
+    return false; // disable page-scrolling behaviour of link
+  });
+  $('#lnkPrev').click(function() {
+    $('#votelist > option:selected')
+      .prop('selected', false)
+      .previous()
+      .prop('selected', true);
+    $('#votelist').trigger('change');
+    return false; // disable page-scrolling behaviour of link
+  });
+});
+</script>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
