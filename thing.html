@@ -4,7 +4,6 @@
 	<style>
 
 	.chart rect {
-	  fill: steelblue;
 	}
 
 	.chart text {
@@ -22,7 +21,7 @@
 
  
 <script src="https:////code.jquery.com/jquery-1.11.2.min.js"></script>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
 $( document ).ready(function() {
@@ -38,22 +37,22 @@ $( document ).ready(function() {
                     	description: $(this).find("Description").text(),
 	                    decision: $(this).find("Decision").text(),
 	                    bill: $(this).find("RelatedBill").text(),
-	                    yeas: $(this).find("TotalYeas").text(),
-	                    nays: $(this).find("TotalNays").text(),
+	                    yeas: Number($(this).find("TotalYeas").text()),
+	                    nays: Number($(this).find("TotalNays").text()),
 	                    paired: $(this).find("TotalPaired").text()
                     };
 
                     // console.log(vote);
-                    data.push(vote.yeas);
-
+                    data.push(vote);
                 });
             });
 
-            var width = 220;
+            var width = 520;
 		    var barHeight = 20;
 
+		    // "Scales are functions that map from an input domain to an output range."
 			var x = d3.scale.linear()
-			    .domain([0, d3.max(data)])
+			    .domain([0, d3.max(data, function(d){return d.yeas + d.nays;})])
 			    .range([0, width]);
 
 			var chart = d3.select(".chart")
@@ -66,14 +65,30 @@ $( document ).ready(function() {
 			    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
 
 			bar.append("rect")
-			    .attr("width", x)
+				.attr("class", "yeas")
+			    .attr("fill", "green")
+			    .attr("x", 0 )
+			    .attr("width", function(d){return x(d.yeas);} )
+			    .attr("height", barHeight - 1);
+
+			bar.append("rect")
+				.attr("class", "nays")
+			    .attr("fill", "red")
+			    .attr("x", function(d) {return x(d.yeas);} )
+			    .attr("width", function(d){return x(d.nays);} )
 			    .attr("height", barHeight - 1);
 
 			bar.append("text")
-			    .attr("x", function(d) { return x(d) - 3; })
+			    .attr("x", function(d) { return 30; })
 			    .attr("y", barHeight / 2)
 			    .attr("dy", ".35em")
-			    .text(function(d) { return d; });
+			    .text(function(d) { return d.yeas; });
+
+			bar.append("text")
+			    .attr("x", function(d) { return x(d.yeas); })
+			    .attr("y", barHeight / 2)
+			    .attr("dy", ".35em")
+			    .text(function(d) { return d.nays; });
 	    },
 	    error : function(){
 	        //error handler..
