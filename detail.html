@@ -87,13 +87,13 @@ $( document ).ready(function() {
 			appendParliamentRatios(parliamentCompositionReal);
 
 			var parliamentCompositionFake = {
-				'Bloc Québécois': {seats: 50},
-				'Conservative': {seats: 50},
-				'Conservative Independent': {seats: 50},
-				'Green Party': {seats: 50},
-				'Independent': {seats: 50},
-				'Liberal': {seats: 50},
-				'NDP': {seats: 50}
+				'Bloc Québécois': {seats: 6},
+				'Conservative': {seats: 139},
+				'Conservative Independent': {seats: 8},
+				'Green Party': {seats: 8},
+				'Independent': {seats: 14},
+				'Liberal': {seats: 44},
+				'NDP': {seats: 108}
 			};
 			appendParliamentRatios(parliamentCompositionFake);
 
@@ -163,6 +163,8 @@ $( document ).ready(function() {
 			console.log("-----------");
 			prettyPrintVote(rescaledVote);
 
+			data = rescaledVote;
+
 
 			// function scaleVotes(realVotes, altParliament) {
 			// 	// Construct an original parliament based on the voting data.
@@ -189,18 +191,26 @@ $( document ).ready(function() {
 
 			// console.log(scaledVotes);
 
-			var yeaVotes = data
-				.map(function(cur, ix, array) {return cur.yea;})
-				.reduce(function(prev, cur, ix, array) {return prev + cur;});
+			// the rendering function must only use aggregate data, and definitely must
+			// not try to work with individual votes. our hypothetical vote results only
+			// make sense in aggregate.
 
-			var nayVotes = data
-				.map(function(cur, ix, array) {return cur.nay;})
-				.reduce(function(prev, cur, ix, array) {return prev + cur;});
+			// also, it's impossible to use .map and .reduce on a custom object! hm.
 
-			var pieData = [
-				{vote: 'yea', count: yeaVotes, colour: 'green'},
-				{vote: 'nay', count: nayVotes, colour: 'red'},
-			];
+			function summarizeVoteOutcome(votesByParty) {
+				var yea = 0;
+				var nay = 0;
+				for (party in votesByParty) {
+					yea += votesByParty[party].yea;
+					nay += votesByParty[party].nay;
+				}
+				return [
+					{vote: 'yea', count: yea, colour: 'green'},
+					{vote: 'nay', count: nay, colour: 'gray'},
+				];
+			}
+
+			var pieData = summarizeVoteOutcome(rescaledVote);
 
 			var width = 360;
 	        var height = 360;
