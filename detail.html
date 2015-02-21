@@ -20,9 +20,40 @@
 <script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
+function voteListingFromXml(xmlVoteListing) {
+	var data = [];
+	var detailResource='http://www.parl.gc.ca/HouseChamberBusiness/Chambervotedetail.aspx';
+	$(xmlVoteListing).find('Votes').each(function(){
+		$(this).find('Vote').each(function(){
+			var vote = {
+				description: $(this).find('Description').text(),
+				decision: $(this).find('Decision').text(),
+				bill: $(this).find('RelatedBill').attr('number'),
+				yeas: Number($(this).find('TotalYeas').text()),
+				nays: Number($(this).find('TotalNays').text()),
+				paired: $(this).find('TotalPaired').text(),
+				voteNumber: $(this).attr('number'),
+				parliament: $(this).attr('parliament'),
+				session: $(this).attr('session'),
+				sitting: $(this).attr('sitting'),
+				date: $(this).attr('date'),
+			};
+			// you could add &xml=True if you wanted XML.
+			vote['url'] = detailResource + "?Language=E&Mode=1&Parl="+vote.parliament+"&Ses="+vote.session+"&FltrParl="+vote.parliament+"&FltrSes="+vote.session+"&vote="+vote.voteNumber;
+
+			// we only care about votes on bills!
+			// TODO: maybe we only care about the most recent bill?
+			if (vote.bill == null) {return;}
+
+			data.push(vote);
+		});
+	});	
+	return data;
+}
+
 /**
  * Produce JSON-style voting data from the XML document provided by Government of Canada.
- * @param {XML} dataXml
+ * @param {XML} dataXML
  * @return {Array} dataJson
  */
 function voteJsonFromVoteXml(dataXML) {
@@ -205,6 +236,23 @@ var alternateParliament = {
 	'NDP': {seats: 108}
 };
 
+function populateVoteListing(parliament, session) {
+	$.ajax({
+		type : 'GET',
+		url : 'data/parl'+parliament+'_sess'+session+'.xml',
+		success : function(dataXML){
+			var voteListing = voteListingFromXml(dataXML);
+			$('#votelist').empty();
+			$.each(voteListing, function(index, value) {
+			    $('#votelist').append($('<option/>', { 
+			        value: value.voteNumber,
+			        text : value.bill,
+			    }));
+			});
+		},
+	});
+}
+
 function populateCharts(parliament, session, vote) {
 	$.ajax({
 		type : 'GET',
@@ -228,9 +276,63 @@ function populateCharts(parliament, session, vote) {
 }
 
 $( document ).ready(function() {
+	populateVoteListing(41, 2);
 	populateCharts(41, 1, 1);
+
+	$('select#parl_session').change(function(){
+		var keys = $(this).val().split(',');
+		var parliament = keys[0];
+		var session = keys[1];
+		populateVoteListing(parliament, session);
+	});
+	$('select#votelist').change(function(){
+		// TODO: wow, this is so hackish.
+		var keys = $('#parl_session').val().split(',');
+		var parliament = keys[0];
+		var session = keys[1];
+		var vote = $(this).val();
+		populateCharts(parliament, session, vote);
+	});
+	$('#lnkNext').click(function() {
+		$('#votelist > option:selected')
+			.prop('selected', false)
+			.next()
+			.prop('selected', true);
+		$('#votelist').trigger('change');
+	});
+	$('#lnkPrev').click(function() {
+		$('#votelist > option:selected')
+			.prop('selected', false)
+			.previous()
+			.prop('selected', true);
+		$('#votelist').trigger('change');
+	});
 });
 </script>
+
+<div style="border:1px solid black; display: block; width: 300px; margin-bottom: 1em;">
+	show the arrangement of actual and hypothetical parliament
+	based on current selection of parliament
+</div>
+
+Parliament/Session
+<select id="parl_session">
+	<option value="41,2">41st Parliament, 2nd Session</option>
+	<option value="41,1">41st Parliament, 1st Session</option>
+	<option value="40,3">40th Parliament, 3rd Session</option>
+	<option value="40,2">40th Parliament, 2nd Session</option>
+	<option value="40,1">40th Parliament, 1st Session</option>
+	<option value="39,2">39th Parliament, 2nd Session</option>
+	<option value="39,1">39th Parliament, 1st Session</option>
+</select>
+
+Vote
+<select id="votelist">
+</select>
+<a id="lnkPrev" href="#">Previous</a>
+<a id="lnkNext" href="#">Next</a>
+
+<br>
 
 <svg id="chart1" class="chart"></svg>
 <svg id="chart2" class="chart"></svg>
