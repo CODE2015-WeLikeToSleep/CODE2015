@@ -50,7 +50,6 @@ $( document ).ready(function() {
 	                    url: ''
                     };
 
-                    // console.log(vote.voteNumber);
                     data.push(vote);
                 });
             });
@@ -65,46 +64,130 @@ $( document ).ready(function() {
 					return foo;
 				}, {});
 
-			console.log(partyVotes);
+			function appendParliamentRatios(parliament) {
+				var totalSeats = 0;
+				for (party in parliament) {
+					totalSeats += parliament[party]['seats'];
+				}
+				for (party in parliament) {
+					parliament[party]['influence'] = parliament[party]['seats'] / totalSeats;
+				}
+				return parliament;
+			}
 
-			// don't bother trying to work out fractions, let d3.js handle that.
-			// this is an imaginary number of seats (308 typically)
-			var alternateParliament1 = [
-				{party:'Bloc Québécois', seats: 50},
-				{party:'Conservative', seats: 50},
-				{party:'Conservative Independent', seats: 8},
-				{party:'Green Party', seats: 50},
-				{party:'Independent', seats: 50},
-				{party:'Liberal', seats: 50},
-				{party:'NDP', seats: 50}
-			]
+			var parliamentCompositionReal = {
+				'Bloc Québécois': {seats: 4},
+				'Conservative': {seats: 162},
+				'Conservative Independent': {seats: 0},
+				'Green Party': {seats: 2},
+				'Independent': {seats: 7},
+				'Liberal': {seats: 36},
+				'NDP': {seats: 95}
+			};
+			appendParliamentRatios(parliamentCompositionReal);
+
+			var parliamentCompositionFake = {
+				'Bloc Québécois': {seats: 50},
+				'Conservative': {seats: 50},
+				'Conservative Independent': {seats: 50},
+				'Green Party': {seats: 50},
+				'Independent': {seats: 50},
+				'Liberal': {seats: 50},
+				'NDP': {seats: 50}
+			};
+			appendParliamentRatios(parliamentCompositionFake);
 
 			// TODO flatten the array because all values are scaled the same way.
 			// wait, maybe we can't flatten the array? things are still scaled based on party.
 
-			function scaleVotes(realVotes, altParliament) {
-				var result = {};
-				// TODO calculate both totals. They will often not be the same, because
-				// not everybody is in attendance.
-				var realTotalVotes = realVotes
-					.map(function(cur,ix,array){return cur.yea + cur.nay;})
-					.reduce(function(cur,ix,array){return prev+cur;});
-				var altTotalVotes = altParliament
-					.map(function(cur,ix,array){return d.seats;})
-					.reduce(function(prev,cur,ix,array){return prev+cur;});
-				Object.keys(realVotes).forEach(function(key) {
-					value = realVotes[key];
-					var realPartyVotes = realVotes[key]['yea'] + realVotes[key]['nay'];
-					//var fakePartyVotes = altParliament
-					var partyScaleFactor = 
-					result[key]['yea'] = realVotes[key]['yea'] * partyScaleFactor;
-					result[key]['nay'] = realVotes[key]['nay'] * partyScaleFactor;
-				});
+			// Realize that the members who participate in any given vote effective
+			// make up an instance of parliament. So you can apply the same treatment to the
+			// effective parliament of a given day as you would to the elected parliament.
+
+			function parliamentFromVotes(votes) {
+				var parliament = {};
+				for (party in votes) {
+					totalVotes = votes[party].yea + votes[party].nay;
+					parliament[party] = {seats: totalVotes};
+				}
+				return parliament;
 			}
 
-			var scaledVotes = scaleVotes(partyVotes, alternateParliament1);
+			var parlForVote = parliamentFromVotes(partyVotes);
+			appendParliamentRatios(parlForVote);
 
-			console.log(scaledVotes);
+			// console.log("actual parl");
+			// console.log("----------");
+			//console.log(parliamentCompositionReal);
+			// console.log("parl composition for vote");
+			// console.log("----------");
+			//console.log(parlForVote);
+
+			// partySupport = partyInfluence * partyFavour
+			// partySupport:   votes in support of a bill, from a given party
+			// partyInfluence: [percentage of?] seats occupied by a party (varies between votes)
+			// partyFavour:    percentage of party members that support a bill
+
+			// scaleVotes() adjusts the per-party votes to fit the explicitly defined altParliament,
+			// also using the implicitly defined altParliament of the voting data.
+			function scaleVote(origVote, altParliament) {
+				// Calculate membership of the point-in-time parliament based on counted votes
+				var actualParliament = parliamentFromVotes(origVote);
+				appendParliamentRatios(actualParliament); // TODO: it's really awkward remembering to do this
+				var newVote = {};
+				// TODO: for..in only works because I'm constructing a trivial object.
+				// If it was a better object, I would need to use a better iterator.
+				for (party in origVote) {
+					var scaleFactor = altParliament[party]['influence'] / actualParliament[party]['influence'];
+					newVote[party] = {
+						yea: Math.round(origVote[party]['yea'] * scaleFactor),
+						nay: Math.round(origVote[party]['nay'] * scaleFactor)
+					};
+				}
+				return newVote;
+			}
+
+			function prettyPrintVote(vote) {
+				for (party in vote) {
+					var yea = vote[party]['yea'];
+					var nay = vote[party]['nay'];
+					console.log(party+": "+yea+" yay. "+nay+" nay. ("+(yea+nay)+" total)");
+				}
+			}
+
+			var rescaledVote = scaleVote(partyVotes, parliamentCompositionFake);
+			console.log("ACTUAL VOTE");
+			console.log("-----------");
+			prettyPrintVote(partyVotes);
+			console.log("SCALED VOTE");
+			console.log("-----------");
+			prettyPrintVote(rescaledVote);
+
+
+			// function scaleVotes(realVotes, altParliament) {
+			// 	// Construct an original parliament based on the voting data.
+			// 	var result = {};
+			// 	// TODO calculate both totals. They will often not be the same, because
+			// 	// not everybody is in attendance.
+			// 	var realTotalVotes = realVotes
+			// 		.map(function(cur,ix,array){return cur.yea + cur.nay;})
+			// 		.reduce(function(prev,cur,ix,array){return prev+cur;});
+			// 	var altTotalVotes = altParliament
+			// 		.map(function(cur,ix,array){return d.seats;})
+			// 		.reduce(function(prev,cur,ix,array){return prev+cur;});
+			// 	Object.keys(realVotes).forEach(function(key) {
+			// 		value = realVotes[key];
+			// 		var realPartyVotes = realVotes[key]['yea'] + realVotes[key]['nay'];
+			// 		//var fakePartyVotes = altParliament
+			// 		var partyScaleFactor = 
+			// 		result[key]['yea'] = realVotes[key]['yea'] * partyScaleFactor;
+			// 		result[key]['nay'] = realVotes[key]['nay'] * partyScaleFactor;
+			// 	});
+			// }
+
+			// var scaledVotes = scaleVotes(partyVotes, alternateParliament1);
+
+			// console.log(scaledVotes);
 
 			var yeaVotes = data
 				.map(function(cur, ix, array) {return cur.yea;})
@@ -118,8 +201,6 @@ $( document ).ready(function() {
 				{vote: 'yea', count: yeaVotes, colour: 'green'},
 				{vote: 'nay', count: nayVotes, colour: 'red'},
 			];
-
-			console.log(pieData);
 
 			var width = 360;
 	        var height = 360;
