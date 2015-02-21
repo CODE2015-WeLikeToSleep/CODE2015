@@ -20,39 +20,52 @@
 <svg class="chart"></svg>
 
  
-<script src="https:////code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
 <script src="http://d3js.org/d3.v3.js"></script>
 <script>
+
+/**
+ * Produce JSON-style voting data from the XML document provided by Government of Canada.
+ * @param {XML} dataXml
+ * @return {Array} dataJson
+ */
+function voteJsonFromVoteXml(dataXML) {
+	var allVotes = [];
+	$(dataXML).find('Vote').each(function(){
+		// var sponsor = $(this).find('Sponsor').text();
+		// var decision = $(this).find('Decision').text();
+		// var bill = $(this).find('RelatedBill').attr('number');
+	    $(this).find('Participant').each(function(){
+	        allVotes.push({
+	        	name: $(this).find("Name").text(),
+	            first: $(this).find("FirstName").text(),
+	            last: $(this).find("LastName").text(),
+	            constituency: $(this).find("Constituency").text(),
+	            province: $(this).find("Province").text(),
+	            provinceCode: $(this).find("Province").attr('code'),
+	            party: $(this).find("Party").text(),
+	            yea: Number($(this).find("RecordedVote").find("Yea").text()),
+	            nay: Number($(this).find("RecordedVote").find("Nay").text()),
+	            paired: Number($(this).find("RecordedVote").find("Paired").text()),
+	            url: '',
+	        });
+	    });
+	});
+	return allVotes;
+	// [
+	// 	  {party: 'NDP', yea: 30, nay: 0},
+	// 	  {party: 'Liberal', yea: 0, nay: 60},
+	//    ...
+	// ]
+}
 
 $( document ).ready(function() {
 
 	$.ajax({
-	    type :"GET",
+	    type : 'GET',
 	    url : 'data/parl41_sess2_vote2.xml',
 	    success : function(dataXML){
-	    	var data = [];
-            $(dataXML).find('Vote').each(function(){
-            	var sponsor = $(this).find('Sponsor').text();
-            	var decision = $(this).find('Decision').text();
-            	var bill = $(this).find('RelatedBill').attr('number');
-                $(this).find('Participant').each(function(){
-                    var vote = {
-                    	name: $(this).find("Name").text(),
-	                    first: $(this).find("FirstName").text(),
-	                    last: $(this).find("LastName").text(),
-	                    constituency: $(this).find("Constituency").text(),
-	                    province: $(this).find("Province").text(),
-	                    provinceCode: $(this).find("Province").attr('code'),
-	                    party: $(this).find("Party").text(),
-	                    yea: Number($(this).find("RecordedVote").find("Yea").text()),
-	                    nay: Number($(this).find("RecordedVote").find("Nay").text()),
-	                    paired: Number($(this).find("RecordedVote").find("Paired").text()),
-	                    url: ''
-                    };
-
-                    data.push(vote);
-                });
-            });
+	    	data = voteJsonFromVoteXml(dataXML);
 
 			// TODO put an example json here
 			var partyVotes = data
@@ -88,12 +101,12 @@ $( document ).ready(function() {
 
 			var parliamentCompositionFake = {
 				'Bloc Québécois': {seats: 6},
-				'Conservative': {seats: 139},
+				'Conservative': {seats: 13900},
 				'Conservative Independent': {seats: 8},
 				'Green Party': {seats: 8},
 				'Independent': {seats: 14},
 				'Liberal': {seats: 44},
-				'NDP': {seats: 108}
+				'NDP': {seats: 1008}
 			};
 			appendParliamentRatios(parliamentCompositionFake);
 
@@ -164,32 +177,6 @@ $( document ).ready(function() {
 			prettyPrintVote(rescaledVote);
 
 			data = rescaledVote;
-
-
-			// function scaleVotes(realVotes, altParliament) {
-			// 	// Construct an original parliament based on the voting data.
-			// 	var result = {};
-			// 	// TODO calculate both totals. They will often not be the same, because
-			// 	// not everybody is in attendance.
-			// 	var realTotalVotes = realVotes
-			// 		.map(function(cur,ix,array){return cur.yea + cur.nay;})
-			// 		.reduce(function(prev,cur,ix,array){return prev+cur;});
-			// 	var altTotalVotes = altParliament
-			// 		.map(function(cur,ix,array){return d.seats;})
-			// 		.reduce(function(prev,cur,ix,array){return prev+cur;});
-			// 	Object.keys(realVotes).forEach(function(key) {
-			// 		value = realVotes[key];
-			// 		var realPartyVotes = realVotes[key]['yea'] + realVotes[key]['nay'];
-			// 		//var fakePartyVotes = altParliament
-			// 		var partyScaleFactor = 
-			// 		result[key]['yea'] = realVotes[key]['yea'] * partyScaleFactor;
-			// 		result[key]['nay'] = realVotes[key]['nay'] * partyScaleFactor;
-			// 	});
-			// }
-
-			// var scaledVotes = scaleVotes(partyVotes, alternateParliament1);
-
-			// console.log(scaledVotes);
 
 			// the rendering function must only use aggregate data, and definitely must
 			// not try to work with individual votes. our hypothetical vote results only
