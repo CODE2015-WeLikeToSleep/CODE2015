@@ -36,16 +36,37 @@ $( document ).ready(function() {
                     var vote = {
                     	description: $(this).find("Description").text(),
 	                    decision: $(this).find("Decision").text(),
-	                    bill: $(this).find("RelatedBill").text(),
+	                    bill: $(this).find("RelatedBill").attr('number'),
 	                    yeas: Number($(this).find("TotalYeas").text()),
 	                    nays: Number($(this).find("TotalNays").text()),
-	                    paired: $(this).find("TotalPaired").text()
+	                    paired: $(this).find("TotalPaired").text(),
+	                    voteNumber: $(this).attr('number'),
+	                    parliament: $(this).attr('parliament'),
+	                    session: $(this).attr('session'),
+	                    sitting: $(this).attr('sitting'),
+	                    date: $(this).attr('date')
                     };
 
-                    // console.log(vote);
+                    // we only care about votes on bills!
+                    // TODO: maybe we only care about the most recent bill?
+                    if (vote.bill == null) {return;}
+
+                    // console.log(vote.voteNumber);
+
+                    // what is the url for obtaining MUCH more data?
+                    // http://www.parl.gc.ca/HouseChamberBusiness/Chambervotedetail.aspx?Language=E&Mode=1&Parl=41&Ses=2&FltrParl=41&FltrSes=2&vote=336&xml=True
+                    // detailResource='http://www.parl.gc.ca/HouseChamberBusiness/Chambervotedetail.aspx'
+                    // detailQuery="Language=E&Mode=1&Parl=41&Ses=2&FltrParl=41&FltrSes=2&vote=336&xml=True"
+
                     data.push(vote);
                 });
             });
+
+			data.sort(function(a,b) {
+				var aBillNumber = Number(a.bill.match(/\d+/)[0]);
+				var bBillNumber = Number(b.bill.match(/\d+/)[0]);
+				return aBillNumber - bBillNumber;
+			});
 
             var width = 520;
 		    var barHeight = 20;
@@ -62,6 +83,7 @@ $( document ).ready(function() {
 			var bar = chart.selectAll("g")
 			    .data(data)
 			  .enter().append("g")
+			    //.attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
 			    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
 
 			bar.append("rect")
@@ -89,6 +111,12 @@ $( document ).ready(function() {
 			    .attr("y", barHeight / 2)
 			    .attr("dy", ".35em")
 			    .text(function(d) { return d.nays; });
+
+			bar.append("text")
+			    .attr("x", function(d) { return 100; })
+			    .attr("y", barHeight / 2)
+			    .attr("dy", ".35em")
+			    .text(function(d) { return d.bill; });
 	    },
 	    error : function(){
 	        //error handler..
