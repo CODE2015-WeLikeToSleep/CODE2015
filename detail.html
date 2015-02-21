@@ -28,7 +28,7 @@ $( document ).ready(function() {
 
 	$.ajax({
 	    type :"GET",
-	    url : 'data/parl41_sess2_vote1.xml',
+	    url : 'data/parl41_sess2_vote2.xml',
 	    success : function(dataXML){
 	    	var data = [];
             $(dataXML).find('Vote').each(function(){
@@ -54,6 +54,57 @@ $( document ).ready(function() {
                     data.push(vote);
                 });
             });
+
+			// TODO put an example json here
+			var partyVotes = data
+				.reduce(function(prev, cur, ix, array) {
+					var foo = prev;
+					foo[cur.party] = foo[cur.party] || { yea:0, nay:0 };
+					foo[cur.party]['yea'] += cur.yea;
+					foo[cur.party]['nay'] += cur.nay;
+					return foo;
+				}, {});
+
+			console.log(partyVotes);
+
+			// don't bother trying to work out fractions, let d3.js handle that.
+			// this is an imaginary number of seats (308 typically)
+			var alternateParliament1 = [
+				{party:'Bloc Québécois', seats: 50},
+				{party:'Conservative', seats: 50},
+				{party:'Conservative Independent', seats: 8},
+				{party:'Green Party', seats: 50},
+				{party:'Independent', seats: 50},
+				{party:'Liberal', seats: 50},
+				{party:'NDP', seats: 50}
+			]
+
+			// TODO flatten the array because all values are scaled the same way.
+			// wait, maybe we can't flatten the array? things are still scaled based on party.
+
+			function scaleVotes(realVotes, altParliament) {
+				var result = {};
+				// TODO calculate both totals. They will often not be the same, because
+				// not everybody is in attendance.
+				var realTotalVotes = realVotes
+					.map(function(cur,ix,array){return cur.yea + cur.nay;})
+					.reduce(function(cur,ix,array){return prev+cur;});
+				var altTotalVotes = altParliament
+					.map(function(cur,ix,array){return d.seats;})
+					.reduce(function(prev,cur,ix,array){return prev+cur;});
+				Object.keys(realVotes).forEach(function(key) {
+					value = realVotes[key];
+					var realPartyVotes = realVotes[key]['yea'] + realVotes[key]['nay'];
+					//var fakePartyVotes = altParliament
+					var partyScaleFactor = 
+					result[key]['yea'] = realVotes[key]['yea'] * partyScaleFactor;
+					result[key]['nay'] = realVotes[key]['nay'] * partyScaleFactor;
+				});
+			}
+
+			var scaledVotes = scaleVotes(partyVotes, alternateParliament1);
+
+			console.log(scaledVotes);
 
 			var yeaVotes = data
 				.map(function(cur, ix, array) {return cur.yea;})
