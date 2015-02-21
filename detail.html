@@ -59,121 +59,121 @@ function voteJsonFromVoteXml(dataXML) {
 	// ]
 }
 
+/**
+ * Produce JSON-style voting data from the XML document provided by Government of Canada.
+ * Summarize the votes by party, discarding information about specific members. We use this to
+ * represent both actual and hypothetical vote results.
+ * BIG TODO: add an attribute indicating whether this is a real or hypothetical result
+ * @param {Array} allVotes
+ * @return {VoteSummary} voteSummary
+ */
+function summarizeVotesByParty(allVotes) {
+	return allVotes
+		.reduce(function(prev, cur, ix, array) {
+			var foo = prev;
+			foo[cur.party] = foo[cur.party] || { yea:0, nay:0 };
+			foo[cur.party]['yea'] += cur.yea;
+			foo[cur.party]['nay'] += cur.nay;
+			return foo;
+		}, {});
+}
+
+/**
+ * Sometimes you just want a vote summary on the console.
+ * @param {VoteSummary} voteSummary
+ */
+function prettyPrintVote(voteSummary) {
+	for (party in voteSummary) {
+		var yea = voteSummary[party]['yea'];
+		var nay = voteSummary[party]['nay'];
+		console.log(party+": "+yea+" yay. "+nay+" nay. ("+(yea+nay)+" total)");
+	}
+}
+
+/**
+ * Derive a new per-party voting outcome based on a hypothetical alternate parliament.
+ * @param {VoteSummary} origVote
+ * @param {Parliament} altParliament
+ */
+function scaleVote(origVote, altParliament) {
+	// Calculate membership of the point-in-time parliament based on counted votes
+	var actualParliament = parliamentFromVotes(origVote);
+	appendParliamentRatios(actualParliament); // TODO: it's really awkward remembering to do this
+	var newVote = {};
+	// TODO: for..in only works because I'm constructing a trivial object.
+	// If it was a better object, I would need to use a better iterator.
+	for (party in origVote) {
+		var scaleFactor = altParliament[party]['influence'] / actualParliament[party]['influence'];
+		newVote[party] = {
+			yea: Math.round(origVote[party]['yea'] * scaleFactor),
+			nay: Math.round(origVote[party]['nay'] * scaleFactor)
+		};
+	}
+	return newVote;
+}
+
+/**
+ * Realize that the members who participate in any given vote effective
+ * make up an instance of parliament. So you can apply the same treatment to the
+ * effective parliament of a given day as you would to the elected parliament.
+ * @param {VoteSummary} voteSummary
+ * @return {Parliament} parliament
+ */
+function parliamentFromVotes(votes) {
+	var parliament = {};
+	for (party in votes) {
+		totalVotes = votes[party].yea + votes[party].nay;
+		parliament[party] = {seats: totalVotes};
+	}
+	return parliament;
+}
+
+/**
+ * Augment a parliament object with ratio calculations.
+ * TODO: make this part of the parliament object. It's awkward right now.
+ * @param {Parliament} parliament
+ * @return {Parliament} parliament
+ */
+function appendParliamentRatios(parliament) {
+	var totalSeats = 0;
+	for (party in parliament) {
+		totalSeats += parliament[party]['seats'];
+	}
+	for (party in parliament) {
+		parliament[party]['influence'] = parliament[party]['seats'] / totalSeats;
+	}
+	return parliament;
+}
+
+// Right now, this alternate parliament is completely imaginary.
+// TODO: We will derive a hypothetical parliament by applying an alternate electoral
+// system to the per-riding elections data (will be obtained elsewhere).
+var alternateParliament = {
+	'Bloc Québécois': {seats: 6},
+	'Conservative': {seats: 139},
+	'Conservative Independent': {seats: 8},
+	'Green Party': {seats: 8},
+	'Independent': {seats: 14},
+	'Liberal': {seats: 44},
+	'NDP': {seats: 108}
+};
+
 $( document ).ready(function() {
 
 	$.ajax({
 	    type : 'GET',
 	    url : 'data/parl41_sess2_vote2.xml',
 	    success : function(dataXML){
-	    	data = voteJsonFromVoteXml(dataXML);
-
-			// TODO put an example json here
-			var partyVotes = data
-				.reduce(function(prev, cur, ix, array) {
-					var foo = prev;
-					foo[cur.party] = foo[cur.party] || { yea:0, nay:0 };
-					foo[cur.party]['yea'] += cur.yea;
-					foo[cur.party]['nay'] += cur.nay;
-					return foo;
-				}, {});
-
-			function appendParliamentRatios(parliament) {
-				var totalSeats = 0;
-				for (party in parliament) {
-					totalSeats += parliament[party]['seats'];
-				}
-				for (party in parliament) {
-					parliament[party]['influence'] = parliament[party]['seats'] / totalSeats;
-				}
-				return parliament;
-			}
-
-			var parliamentCompositionReal = {
-				'Bloc Québécois': {seats: 4},
-				'Conservative': {seats: 162},
-				'Conservative Independent': {seats: 0},
-				'Green Party': {seats: 2},
-				'Independent': {seats: 7},
-				'Liberal': {seats: 36},
-				'NDP': {seats: 95}
-			};
-			appendParliamentRatios(parliamentCompositionReal);
-
-			var parliamentCompositionFake = {
-				'Bloc Québécois': {seats: 6},
-				'Conservative': {seats: 13900},
-				'Conservative Independent': {seats: 8},
-				'Green Party': {seats: 8},
-				'Independent': {seats: 14},
-				'Liberal': {seats: 44},
-				'NDP': {seats: 1008}
-			};
-			appendParliamentRatios(parliamentCompositionFake);
-
-			// TODO flatten the array because all values are scaled the same way.
-			// wait, maybe we can't flatten the array? things are still scaled based on party.
-
-			// Realize that the members who participate in any given vote effective
-			// make up an instance of parliament. So you can apply the same treatment to the
-			// effective parliament of a given day as you would to the elected parliament.
-
-			function parliamentFromVotes(votes) {
-				var parliament = {};
-				for (party in votes) {
-					totalVotes = votes[party].yea + votes[party].nay;
-					parliament[party] = {seats: totalVotes};
-				}
-				return parliament;
-			}
-
+	    	var data = voteJsonFromVoteXml(dataXML);
+	    	var partyVotes = summarizeVotesByParty(data);
+				appendParliamentRatios(alternateParliament);
 			var parlForVote = parliamentFromVotes(partyVotes);
-			appendParliamentRatios(parlForVote);
+				appendParliamentRatios(parlForVote);
 
-			// console.log("actual parl");
-			// console.log("----------");
-			//console.log(parliamentCompositionReal);
-			// console.log("parl composition for vote");
-			// console.log("----------");
-			//console.log(parlForVote);
-
-			// partySupport = partyInfluence * partyFavour
-			// partySupport:   votes in support of a bill, from a given party
-			// partyInfluence: [percentage of?] seats occupied by a party (varies between votes)
-			// partyFavour:    percentage of party members that support a bill
-
-			// scaleVotes() adjusts the per-party votes to fit the explicitly defined altParliament,
-			// also using the implicitly defined altParliament of the voting data.
-			function scaleVote(origVote, altParliament) {
-				// Calculate membership of the point-in-time parliament based on counted votes
-				var actualParliament = parliamentFromVotes(origVote);
-				appendParliamentRatios(actualParliament); // TODO: it's really awkward remembering to do this
-				var newVote = {};
-				// TODO: for..in only works because I'm constructing a trivial object.
-				// If it was a better object, I would need to use a better iterator.
-				for (party in origVote) {
-					var scaleFactor = altParliament[party]['influence'] / actualParliament[party]['influence'];
-					newVote[party] = {
-						yea: Math.round(origVote[party]['yea'] * scaleFactor),
-						nay: Math.round(origVote[party]['nay'] * scaleFactor)
-					};
-				}
-				return newVote;
-			}
-
-			function prettyPrintVote(vote) {
-				for (party in vote) {
-					var yea = vote[party]['yea'];
-					var nay = vote[party]['nay'];
-					console.log(party+": "+yea+" yay. "+nay+" nay. ("+(yea+nay)+" total)");
-				}
-			}
-
-			var rescaledVote = scaleVote(partyVotes, parliamentCompositionFake);
+			var rescaledVote = scaleVote(partyVotes, alternateParliament);
 			console.log("ACTUAL VOTE");
-			console.log("-----------");
 			prettyPrintVote(partyVotes);
 			console.log("SCALED VOTE");
-			console.log("-----------");
 			prettyPrintVote(rescaledVote);
 
 			data = rescaledVote;
@@ -193,7 +193,7 @@ $( document ).ready(function() {
 				}
 				return [
 					{vote: 'yea', count: yea, colour: 'green'},
-					{vote: 'nay', count: nay, colour: 'gray'},
+					{vote: 'nay', count: nay, colour: 'lightgray'},
 				];
 			}
 
