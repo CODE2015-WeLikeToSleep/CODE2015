@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+	<style>
+
+	.chart rect {
+	}
+
+	.chart text {
+	  fill: white;
+	  font: 10px sans-serif;
+	  text-anchor: end;
+	}
+
+	</style>
+</head>
+<body>
+
+
+<svg class="chart"></svg>
+
+ 
+<script src="https:////code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script>
+
+$( document ).ready(function() {
+
+	$.ajax({
+	    type :"GET",
+	    url : 'data/parl41_sess2_vote1.xml',
+	    success : function(dataXML){
+	    	var data = [];
+            $(dataXML).find('Vote').each(function(){
+            	var sponsor = $(this).find('Sponsor').text();
+            	var decision = $(this).find('Decision').text();
+            	var bill = $(this).find('RelatedBill').attr('number');
+                $(this).find('Participant').each(function(){
+                    var vote = {
+                    	name: $(this).find("Name").text(),
+	                    first: $(this).find("FirstName").text(),
+	                    last: $(this).find("LastName").text(),
+	                    constituency: $(this).find("Constituency").text(),
+	                    province: $(this).find("Province").text(),
+	                    provinceCode: $(this).find("Province").attr('code'),
+	                    party: $(this).find("Party").text(),
+	                    yea: Number($(this).find("RecordedVote").find("Yea").text()),
+	                    nay: Number($(this).find("RecordedVote").find("Nay").text()),
+	                    paired: Number($(this).find("RecordedVote").find("Paired").text()),
+	                    url: ''
+                    };
+
+                    // console.log(vote.voteNumber);
+                    data.push(vote);
+                });
+            });
+
+			var yeaVotes = data
+				.map(function(cur, ix, array) {return cur.yea;})
+				.reduce(function(prev, cur, ix, array) {return prev + cur;});
+
+			var nayVotes = data
+				.map(function(cur, ix, array) {return cur.nay;})
+				.reduce(function(prev, cur, ix, array) {return prev + cur;});
+
+			var pieData = [
+				{vote: 'yea', count: yeaVotes, colour: 'green'},
+				{vote: 'nay', count: nayVotes, colour: 'red'},
+			];
+
+			console.log(pieData);
+
+			var width = 360;
+	        var height = 360;
+	        var radius = Math.min(width, height) / 2;
+
+			var svg = d3.select('.chart')
+			    .attr("width", width)
+			    .attr("height", height)
+			    .append('g')
+				.attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')');
+
+			var arc = d3.svg.arc()
+				.outerRadius(radius);
+
+	        var pie = d3.layout.pie()
+				.value(function(d) { return d.count; })
+				.sort(null);
+
+	        var path = svg.selectAll('path')
+				.data(pie(pieData))
+				.enter()
+				.append('path')
+				.attr('d', arc)
+				.attr('fill', function f(d,i){return d.data.colour;});
+
+	    },
+	    error : function(){
+	        //error handler..
+	    }
+	});
+
+});
+
+</script>
+
+
+
+
+</body>
+</html>
