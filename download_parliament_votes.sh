@@ -6,40 +6,39 @@ CHAMBER_VOTE_DETAIL_RESOURCE='http://www.parl.gc.ca/HouseChamberBusiness/Chamber
 
 
 function download_vote_details () {
+	mkdir -p data
 	REGEX="parl([0-9]+)_sess([0-9]+).xml"
-	for i in $( ls parl??_sess?.xml ); do
+	for i in $( ls data/parl??_sess?.xml ); do
 		[[ $i =~ $REGEX ]]
 		PARL="${BASH_REMATCH[1]}"
 		SESS="${BASH_REMATCH[2]}"
 
-        for VOTE in $(xpath $i '/Votes/Vote/@number' 2>/dev/null | xargs -n1 | cut -d= -f2) ; do
-	    	URL="${CHAMBER_VOTE_DETAIL_RESOURCE}?Language=E&Mode=1&Parl=${PARL}&Ses=${SESS}&FltrParl=${PARL}&FltrSes=${SESS}&vote=${VOTE}&xml=True"
-            echo "${URL}"
+		echo "Parsing vote list ${i}"
+		for VOTE in $(xpath $i '/Votes/Vote/@number' 2>/dev/null | xargs -n1 | cut -d= -f2) ; do
+			URL="${CHAMBER_VOTE_DETAIL_RESOURCE}?Language=E&Mode=1&Parl=${PARL}&Ses=${SESS}&FltrParl=${PARL}&FltrSes=${SESS}&vote=${VOTE}&xml=True"
 
-        	OUTPUT="parl${PARL}_sess${SESS}_vote${VOTE}.xml"
+			OUTPUT="data/parl${PARL}_sess${SESS}_vote${VOTE}.xml"
 			if [ ! -f "${OUTPUT}" ] ; then
+				echo "${URL}"
 				curl --output "${OUTPUT}" "${URL}"
-			else
-				echo "Already have downloaded file ${OUTPUT}"
 			fi
-	    done
-
-        echo "${URL}"
-    done
+		done
+	done
 	#VOTE_NUMBERS=$(xpath parl39_sess1.xml '/Votes/Vote/@number' 2>/dev/null | xargs -n1 | cut -d= -f2)
 	#for i in $( ls ); do
-    #        echo item: $i
-    #    done
+	#        echo item: $i
+	#    done
 }
 
 function download_votes () {
+	mkdir -p data
 	N_PARLIAMENT="$1"
 	N_SESSION="$2"
-	OUTPUT="parl${N_PARLIAMENT}_sess${N_SESSION}.xml"
+	OUTPUT="data/parl${N_PARLIAMENT}_sess${N_SESSION}.xml"
 	if [ ! -f "${OUTPUT}" ] ; then
-		curl --output "${OUTPUT}" "${CHAMBER_VOTE_RESOURCE}?Language=E&Parl=41&Ses=2&xml=True"
-	else
-		echo "Already have downloaded file ${OUTPUT}"
+		URL="${CHAMBER_VOTE_RESOURCE}?Language=E&Parl=${N_PARLIAMENT}&Ses=${N_SESSION}&xml=True"
+		echo "${URL}"
+		curl --output "${OUTPUT}" "${URL}"
 	fi
 }
 
