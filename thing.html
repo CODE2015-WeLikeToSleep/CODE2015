@@ -31,6 +31,7 @@ $( document ).ready(function() {
 	    url : 'parl41-sess1.xml',
 	    success : function(dataXML){
 	    	var data = [];
+            var detailResource='http://www.parl.gc.ca/HouseChamberBusiness/Chambervotedetail.aspx';
             $(dataXML).find('Votes').each(function(){
                 $(this).find("Vote").each(function(){
                     var vote = {
@@ -44,19 +45,18 @@ $( document ).ready(function() {
 	                    parliament: $(this).attr('parliament'),
 	                    session: $(this).attr('session'),
 	                    sitting: $(this).attr('sitting'),
-	                    date: $(this).attr('date')
+	                    date: $(this).attr('date'),
+
                     };
+                    // you could add &xml=True if you wanted XML.
+                    vote['url'] = detailResource + "?Language=E&Mode=1&Parl="+vote.parliament+"&Ses="+vote.session+"&FltrParl="+vote.parliament+"&FltrSes="+vote.session+"&vote="+vote.voteNumber;
+
 
                     // we only care about votes on bills!
                     // TODO: maybe we only care about the most recent bill?
                     if (vote.bill == null) {return;}
 
                     // console.log(vote.voteNumber);
-
-                    // what is the url for obtaining MUCH more data?
-                    // http://www.parl.gc.ca/HouseChamberBusiness/Chambervotedetail.aspx?Language=E&Mode=1&Parl=41&Ses=2&FltrParl=41&FltrSes=2&vote=336&xml=True
-                    // detailResource='http://www.parl.gc.ca/HouseChamberBusiness/Chambervotedetail.aspx'
-                    // detailQuery="Language=E&Mode=1&Parl=41&Ses=2&FltrParl=41&FltrSes=2&vote=336&xml=True"
 
                     data.push(vote);
                 });
@@ -86,14 +86,18 @@ $( document ).ready(function() {
 			    //.attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
 			    .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
 
-			bar.append("rect")
+			bar.append("svg:a")
+				.attr("xlink:href", function(d){return d.url;})
+				.append("rect")
 				.attr("class", "yeas")
 			    .attr("fill", "green")
 			    .attr("x", 0 )
 			    .attr("width", function(d){return x(d.yeas);} )
 			    .attr("height", barHeight - 1);
 
-			bar.append("rect")
+			bar.append("svg:a")
+				.attr("xlink:href", function(d){return d.url;})
+				.append("rect")
 				.attr("class", "nays")
 			    .attr("fill", "red")
 			    .attr("x", function(d) {return x(d.yeas);} )
