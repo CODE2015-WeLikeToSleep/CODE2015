@@ -20,6 +20,13 @@
 <script src="http://d3js.org/d3.v3.js"></script>
 <script>
 
+/*
+ * Global variables
+ * cachedVoteListing - a hash of voteListing, keyed on a string like "p41.s1"
+ */
+cachedVoteListing = {}
+
+// TODO add function comment
 function voteListingFromXml(xmlVoteListing) {
 	var data = [];
 	var detailResource='http://www.parl.gc.ca/HouseChamberBusiness/Chambervotedetail.aspx';
@@ -237,20 +244,36 @@ var alternateParliament = {
 };
 
 function populateVoteListing(parliament, session) {
-	$.ajax({
-		type : 'GET',
-		url : 'data/parl'+parliament+'_sess'+session+'.xml',
-		success : function(dataXML){
-			var voteListing = voteListingFromXml(dataXML);
-			$('#votelist').empty();
-			$.each(voteListing, function(index, value) {
-			    $('#votelist').append($('<option/>', { 
-			        value: value.voteNumber,
-			        text : value.bill,
-			    }));
-			});
-		},
-	});
+	function doPopulateVoteListing(voteListing) {
+		$('#votelist').empty();
+		$.each(voteListing, function(index, value) {
+		    $('#votelist').append($('<option/>', { 
+		        value: value.voteNumber,
+		        text : value.bill,
+		    }));
+		});
+	}
+
+	// TODO: ask Neil about a better approach for lazy ajax fetch followed by acting on an object.
+	// especially when I'm going to work with that object in multiple places. write checking code everywhere?
+	// Neil says: yeah, check undefined, but keep one copy of the jQuery get and hang everything off of that. nice!
+	// Alright, then how do I handle cache invalidations? probably the easiest way is to not do cache invalidation,
+	// and just have an in-memory namespace. use the URL as the cache key.
+	// Maybe I need to read about promises.
+	var fetchUrl = 'data/parl'+parliament+'_sess'+session+'.xml';
+	if (typeof cachedVoteListing[fetchUrl] != "undefined") {
+		console.log('using cached version');
+		doPopulateVoteListing(cachedVoteListing[fetchUrl]);
+	} else {
+		$.ajax({
+			type : 'GET',
+			url : fetchUrl,
+			success : function(dataXML){
+				cachedVoteListing[fetchUrl] = voteListingFromXml(dataXML);
+				doPopulateVoteListing(cachedVoteListing[fetchUrl]);
+			},
+		});
+	}
 }
 
 function populateCharts(parliament, session, vote) {
@@ -293,6 +316,7 @@ $( document ).ready(function() {
 		var vote = $(this).val();
 		populateCharts(parliament, session, vote);
 	});
+
 	$('#lnkNext').click(function() {
 		$('#votelist > option:selected')
 			.prop('selected', false)
@@ -321,7 +345,8 @@ Parliament/Session
 	<option value="41,1">41st Parliament, 1st Session</option>
 	<option value="40,3">40th Parliament, 3rd Session</option>
 	<option value="40,2">40th Parliament, 2nd Session</option>
-	<option value="40,1">40th Parliament, 1st Session</option>
+	<!-- the 40th parliament, 1st session is dumb and has no real bills. -->
+	<!--<option value="40,1">40th Parliament, 1st Session</option>-->
 	<option value="39,2">39th Parliament, 2nd Session</option>
 	<option value="39,1">39th Parliament, 1st Session</option>
 </select>
@@ -334,6 +359,7 @@ Vote
 
 <br>
 
+<span id="billdesc">No description</span>
 <svg id="chart1" class="chart"></svg>
 <svg id="chart2" class="chart"></svg>
 
