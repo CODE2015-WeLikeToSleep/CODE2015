@@ -9,6 +9,8 @@
     <link rel="icon" href="../../favicon.ico">
     <title>Healthy Voting</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+        <link href="carousel.css" rel="stylesheet">
+
     <style type="text/css">
     html {
       margin: 0;
@@ -67,6 +69,36 @@
           <a class="btn btn-lg btn-primary" href="#browse" role="button">See Bills and Votes &raquo;</a>
         </p>
       </div>
+
+    <!-- Carousel
+    ================================================== -->
+    <div id="myCarousel" class="row leaves carousel slide" data-ride="carousel">
+      <!-- Indicators -->
+      <ol class="carousel-indicators" id="carouselIndicatorList">
+        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+      </ol>
+      <div class="carousel-inner" role="listbox" id="innerCarousel">
+        <div class="item active">
+          <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="First slide">
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>Featured Bills</h1>
+              <p>Scroll through these featured bills.</p>
+              <!--<p><a class="btn btn-lg btn-primary" href="#" role="button">View Outcome</a></p>-->
+            </div>
+          </div>
+        </div>
+        <!-- this is filled by javascript -->
+      </div>
+      <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div><!-- /.carousel -->
 
       <div class="row" id="browse" style="padding: 3em; background-color: #BBBBBB;">
         <a class="anchor" name="browse"></a>
@@ -141,14 +173,14 @@ Vote
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script src="http://d3js.org/d3.v3.js"></script>
+<script src="d3.v3.js"></script>
 <script src="Model.ChamberVoteDetail.js"></script>
 <script src="Model.Parliament.js"></script>
 <script src="voting.js"></script>
 <script>
 
 billSummaries = {
-    '41.2.371': 'This enactment provides that the Minister of Health must<br> (a) in consultation with the Minister of the Environment, the provincial ministers responsible for health and with representatives of municipalities, establish a national strategy to reduce the effects of urban heat islands; and \n (b) table a report in the House of Commons on the implementation of this Act that sets out the results of the efforts to reduce the effects of urban heat islands.',
+//    '41.2.371': 'This enactment provides that the Minister of Health must<br> (a) in consultation with the Minister of the Environment, the provincial ministers responsible for health and with representatives of municipalities, establish a national strategy to reduce the effects of urban heat islands; and \n (b) table a report in the House of Commons on the implementation of this Act that sets out the results of the efforts to reduce the effects of urban heat islands.',
     '41.2.61': 'This enactment amends the Department of Health Act to oblige drug suppliers to advise the Minister of any interruption or cessation of the production, distribution or importation of drugs and to oblige the Minister to prepare and implement an emergency response plan to address shortages of drugs',
     '39.1.164': 'This enactment extends the maximum period for which benefits for illness, injury or quarantine may be paid from fifteen weeks to fifty weeks.',
     '39.2.29': 'The purpose of this enactment is to require alcoholic beverages to bear a warning regarding the effects of alcohol on the ability to operate vehicles and machinery and on the health of the consumer, and regarding the possibility of birth defects when consumed during pregnancy.',
@@ -158,6 +190,24 @@ billSummaries = {
     '41.1.172': 'This enactment prohibits the removal of water in bulk from major drainage basins in Canada.',
     '41.1.742': 'This enactment addresses health and safety issues on reserve lands and certain other lands by providing for regulations to govern drinking water and waste water treatment in First Nations communities. Regulations could be made on a province-by-province basis to mirror existing provincial regulatory regimes, with adaptations to address the circumstances of First Nations living on those lands.'
 }
+
+var cIndex = 1;
+for (featureKey in billSummaries) {
+  var summaryText = billSummaries[featureKey];
+  var anchorFragment = featureKey.replace(/\./g, '/');
+  var linkUrl = document.URL.replace(/#.*$/, "") + '#browse/'+anchorFragment
+  var newElement = '<div class="item"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAFVVVQAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="><div class="container"><div class="carousel-caption"><h1>'+featureKey+'</h1><p>'+summaryText+'</p><p><a class="btn btn-lg btn-primary" href="'+linkUrl+'" role="button">View Outcome</a></p></div></div></div>';
+  $("#innerCarousel").append(newElement);
+
+  $('#carouselIndicatorList').append('<li data-target="#myCarousel" data-slide-to="'+cIndex+'"></li>');
+  cIndex += 1;
+}
+
+var foo = $('#innerCarousel .item .container .carousel-caption a.btn-primary');
+foo.click(function(){
+  jumpHash = '#browse/'+$(this).attr('href').replace(/^.*#browse\//, "");
+  browseJump(jumpHash);
+});
 
 function populateVoteListing(parliament, session) {
   function doPopulateVoteListing(voteListing) {
@@ -216,7 +266,34 @@ function populateCharts(parliament, session, vote) {
     $('#summarytext').text(billSummaries[parliament+'.'+session+'.'+vote] || '');
   });
 
-  window.history.pushState({},"TITLE_NOT_IMPL", document.URL.replace(/#.*$/, "") + '#browse/'+parliament+'/'+session+'/'+vote);
+  var browseHash = parliament+'/'+session+'/'+vote;
+  console.log('pushing url state ' + browseHash);
+  window.history.pushState({},"TITLE_NOT_IMPL", document.URL.replace(/#.*$/, "") + '#browse/'+browseHash);
+}
+
+function browseJump(hash) {
+  console.log('jumping to:' + hash);
+  //var hash = window.location.hash;
+  var parliament = 41;
+  var session = 2;
+  var vote = 329;
+  if (hash.indexOf('#browse/') != -1) {
+    var params = hash.replace('#browse/', '').split('/');
+    parliament = params[0];
+    session = params[1];
+    vote = params[2];
+  }
+
+  $("#parl_session").val(parliament+','+session);
+  populateVoteListing(parliament, session);
+
+  // FIXME: setTimeout is a terrible way to do this.
+  setTimeout(function() {
+    $("#votelist").val(vote);
+    populateCharts(parliament, session, vote);
+  }, 1000);
+
+  $(document).scrollTop( $("#browse").offset().top );  
 }
 
 $( document ).ready(function() {
@@ -252,25 +329,7 @@ $( document ).ready(function() {
     return false; // disable page-scrolling behaviour of link
   });
 
-  var hash = window.location.hash;
-  var parliament = 41;
-  var session = 2;
-  var vote = 329;
-  if (hash.indexOf('#browse/') != -1) {
-    var params = hash.replace('#browse/', '').split('/');
-    parliament = params[0];
-    session = params[1];
-    vote = params[2];
-  }
-
-  $("#parl_session").val(parliament+','+session);
-  populateVoteListing(parliament, session);
-
-  // FIXME: setTimeout is a terrible way to do this.
-  setTimeout(function() {
-    $("#votelist").val(vote);
-    populateCharts(parliament, session, vote);
-  }, 1000);
+  browseJump(window.location.hash);
 });
 </script>
 
