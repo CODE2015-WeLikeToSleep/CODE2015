@@ -154,7 +154,6 @@ ChamberVoteDetail.prototype.getParliamentToday = function() {
 	var self = this;
 	var parliament = new Parliament();
 	this.parties().forEach(function(value,ix,array){
-		console.log(value);
 		parliament.parties[value] = {party: value, seats: self.sumVotesByParty(value)};
 	});
 	return parliament;
