@@ -40,7 +40,6 @@ $stmt->bind_result($decision, $con_yes, $con_no, $con_paired, $lib_yes, $lib_no,
 
 $json = "";
 while ($stmt->fetch()) {
-    echo "$lib_yes";
     $json = json_encode(['parliament' => $parliament,
                          'session' => $session,
                          'vote' => $vote,
