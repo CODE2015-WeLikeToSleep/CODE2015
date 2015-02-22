@@ -17,9 +17,9 @@ DATABASE = "code2015"
 
 # define result years and URLs to grab
 resultURLs = {
-    2006: "http://www.elections.ca/scripts/OVR2011/34/data_donnees/pollresults_resultatsbureau_canada.zip",
+    2011: "http://www.elections.ca/scripts/OVR2011/34/data_donnees/pollresults_resultatsbureau_canada.zip",
     2008: "http://www.elections.ca/scripts/OVR2008/31/data/pollresults_resultatsbureau_canada.zip",
-    2011: "http://www.elections.ca/scripts/OVR2006/25/data_donnees/pollresults_resultatsbureau_canada.zip",
+    2006: "http://www.elections.ca/scripts/OVR2006/25/data_donnees/pollresults_resultatsbureau_canada.zip",
 }
 
 def processElectionURL(electYear, url):
