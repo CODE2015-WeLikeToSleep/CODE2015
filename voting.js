@@ -5,14 +5,12 @@
 cachedVoteListing = {}
 
 partySortIndex = {
-	'Conservative': 1,
-	'NDP': 2,
-	'Liberal': 3,
-	'Green Party': 4,
-	'Bloc Québécois': 5,
-	'Conservative Independent': 6,
-	'Independent': 6,
-	'Forces et Démocratie': 7
+	'conservative': 1,
+	'ndp': 2,
+	'liberal': 3,
+	'green party': 4,
+	'bloc quebecois': 5,
+	'other': 6,
 }
 
 partyColours = {
