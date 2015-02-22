@@ -11,7 +11,7 @@ def main():
 
     print(os.path.join(path, '*.xml'))
     for infile in glob.glob(os.path.join(path, '*.xml')):
-        print "current file is: " + infile
+        print("current file is: " + infile)
         records = parse_xml(infile)
         if records is None:
             continue

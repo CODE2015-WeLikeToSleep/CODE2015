@@ -12,16 +12,16 @@ def main():
 
     print(os.path.join(path, '*.xml'))
     for infile in glob.glob(os.path.join(path, '*.xml')):
-        print "current file is: " + infile
+        print("current file is: " + infile)
         my_dict = parse_xml(infile)
 
         if my_dict is None:
             continue  # only care for votes related to bills
 
-        # this depends on file path format not changing
-        my_dict['parl_number'] = infile[18:20]
-        my_dict['session_number'] = infile[25:26]
-        my_dict['vote_number'] = infile[31:].replace('.xml', '')
+        file_name = infile.split("/")[-1].split("_")
+        my_dict['parl_number'] = file_name[0].replace('parl', '')
+        my_dict['session_number'] = file_name[1].replace('sess', '')
+        my_dict['vote_number'] = file_name[2].replace('vote', '').replace('.xml', '')
 
         cur = con.cursor()
         try:
