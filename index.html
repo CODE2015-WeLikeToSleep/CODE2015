@@ -102,6 +102,7 @@ Vote
 <svg id="chart1" class="chart"></svg>
 <svg id="chart2" class="chart"></svg>
 
+<span id="billnumber"></span>
 <span id="desctext"></span>
 <span id="summarytext"></span>
 
@@ -203,6 +204,7 @@ function populateCharts(parliament, session, vote) {
     renderParliament('#parlchart2', alternateParliament);
 
     $('#desctext').text(vote.description);
+    $('#billnumber').text(vote.bill);
     $('#summarytext').text(billSummaries[parliament+'.'+session+'.'+vote]);
   });
 
