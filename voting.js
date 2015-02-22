@@ -4,6 +4,36 @@
  */
 cachedVoteListing = {}
 
+partySortIndex = {
+	'Conservative': 1,
+	'NDP': 2,
+	'Liberal': 3,
+	'Green Party': 4,
+	'Bloc Québécois': 5,
+	'Conservative Independent': 6,
+	'Independent': 6,
+	'Forces et Démocratie': 7
+}
+
+partyColours = {
+	'NDP.yea': '#FF6600',
+	'NDP.nay': '#DDDDDD',
+	'Liberal.yea': '#DB0B27',
+	'Liberal.nay': '#DDDDDD',
+	'Conservative.yea': '#144897',
+	'Conservative.nay': '#DDDDDD',
+	'Green Party.yea': '#2D9C44',
+	'Green Party.nay': '#DDDDDD',
+	'Bloc Québécois.yea': '#0998F8',
+	'Bloc Québécois.nay': '#DDDDDD',
+	'Forces et Démocratie.yea': 'red',
+	'Forces et Démocratie.nay': '#DDDDDD',
+	'Conservative Independent.yea': '#144897',
+	'Conservative Independent.nay': '#DDDDDD',
+	'Independent.yea': 'yellow',
+	'Independent.nay': '#DDDDDD'
+};
+
 // TODO add function comment
 function voteListingFromXml(xmlVoteListing) {
 	var data = [];
@@ -170,24 +200,6 @@ function pieDataFromVoteSummary(votesByParty) {
 	var yea = 0;
 	var nay = 0;
 	var results = [];
-	var partyColours = {
-		'NDP.yea': '#FF6600',
-		'NDP.nay': '#DDDDDD',
-		'Liberal.yea': '#DB0B27',
-		'Liberal.nay': '#DDDDDD',
-		'Conservative.yea': '#144897',
-		'Conservative.nay': '#DDDDDD',
-		'Green Party.yea': '#2D9C44',
-		'Green Party.nay': '#DDDDDD',
-		'Bloc Québécois.yea': '#0998F8',
-		'Bloc Québécois.nay': '#DDDDDD',
-		'Forces et Démocratie.yea': 'red',
-		'Forces et Démocratie.nay': '#DDDDDD',
-		'Conservative Independent.yea': 'yellow',
-		'Conservative Independent.nay': '#DDDDDD',
-		'Independent.yea': 'yellow',
-		'Independent.nay': '#DDDDDD'
-	};
 	for (party in votesByParty) {
 		results.push({
 			party: party,
@@ -252,6 +264,43 @@ function renderPieVoteSummary(elementSelector, voteSummary, reverse) {
 		.attr('d', arc)
 		.attr('class', function(d,i){return d.data.party;})
 		.attr('fill', function(d,i){return d.data.colour;});
+}
+
+/**
+ * Use D3.js to draw the composition of a parliament.
+ * @param {String} elementSelector
+ * @param {VoteSummary} voteSummary
+ */
+function renderParliament(elementSelector, parliament) {
+	// A parliament is a hash, not an array. But D3.js can ONLY read arrays.
+	var chartData = Object.keys(parliament).map(function(cur,ix,array) {
+		entry = parliament[cur];
+		entry['party'] = cur;
+		return entry;
+	});
+
+	chartData.sort(function(a,b) {
+		//return a.party.localeCompare(b.party);
+		return partySortIndex[a.party] - partySortIndex[b.party];
+	})
+
+	var width = 200;
+	var height = 200;
+
+	var svg = d3.select(elementSelector)
+		.attr("width", width)
+		.attr("height", height);
+
+	var rect = svg.selectAll('rect')
+		.data(chartData)
+		.enter()
+		.append('rect')
+		.attr('transform', function(d, i) { return "translate(0," + i * 10 + ")"; })
+		.attr('x', 0)
+		.attr('width', function(d,i){return d.seats;})
+		.attr('height', 10)
+		.attr('class', 'rectclass')
+		.attr('fill', function(d,i){return partyColours[d.party+'.yea'];});
 }
 
 // Right now, this alternate parliament is completely imaginary.
