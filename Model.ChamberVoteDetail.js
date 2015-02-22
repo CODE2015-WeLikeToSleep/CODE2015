@@ -44,6 +44,23 @@ function ChamberVoteDetail(p, s, v) {
 	// Per-member voting details are intentionally omitted
 }
 
+ChamberVoteDetail.prototype.fetchAsync = function(callback) {
+	var self = this;
+	$.ajax({
+		type: 'GET',
+		dataType: 'json',
+		url: 'votedata.php?p='+this.nthParliament+'&s='+this.nthSession+'&v='+this.nthVote,
+		success: function(dataJSON){
+			this.decision = dataJSON.decision;
+			dataJSON.details.forEach(function(value,ix,array){
+				self.votes.push(new PartyVoteCount(value.party,VoteType.YEA,value['yea']));
+				self.votes.push(new PartyVoteCount(value.party,VoteType.NAY,value['nay']));
+			});
+			callback(self);
+		}
+	})
+}
+
 /**
  * Download the specifics of this chamber vote.
  * @param callback - takes one parameter, is the produced object

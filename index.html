@@ -184,7 +184,7 @@ function populateCharts(parliament, session, vote) {
   chamberVote.description = 'description';
   chamberVote.bill = 'bill';
 
-  chamberVote.fetchXmlAsync(function(vote){
+  chamberVote.fetchAsync(function(vote){
     var rescaledVote = vote.newScaledVote(alternateParliament);
     renderPieVoteSummary('#chart1', vote, false);
     renderPieVoteSummary('#chart2', rescaledVote, true);
