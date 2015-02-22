@@ -52,6 +52,7 @@ function fetchParliamentByYear(method, year, callback) {
 		'Conservative': 'conservative',
 		'Liberal': 'liberal',
 		'NDP-New Democratic Party': 'ndp',
+		'N.D.P.': 'ndp',
 		'Bloc Quebecois': 'bloc quebecois',
 		'Green Party': 'green party',
 		'other': 'other',
