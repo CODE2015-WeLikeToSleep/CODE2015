@@ -6,8 +6,8 @@ import xml.etree.ElementTree as ET
 
 
 def main():
-    path = '../data/summaries/'
-    con = mdb.connect('localhost', 'test_user', 'mysqlpw', 'code')
+    path = './data/summaries/'
+    con = mdb.connect('localhost', 'root', 'code2015', 'code2015')
 
     print(os.path.join(path, '*.xml'))
     for infile in glob.glob(os.path.join(path, '*.xml')):
