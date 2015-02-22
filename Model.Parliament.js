@@ -61,7 +61,7 @@ function fetchParliamentByYear(method, year, callback) {
 	$.ajax({
 		type: 'GET',
 		dataType: 'json',
-		url: electionDataResource + '?y=' + year;
+		url: electionDataResource + '?y=' + year,
 		success: function(dataJSON){
 			var parliament = new Parliament();
 			dataJSON.forEach(function(value,ix,array){
