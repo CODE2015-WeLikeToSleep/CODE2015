@@ -144,6 +144,12 @@ Vote
 <script src="Model.Parliament.js"></script>
 <script src="voting.js"></script>
 <script>
+
+billSummaries = {
+  '41.1.376': 'Summarytext',
+  '40.2.123': 'Summarytext'
+}
+
 function populateVoteListing(parliament, session) {
   function doPopulateVoteListing(voteListing) {
     $('#votelist').empty();
