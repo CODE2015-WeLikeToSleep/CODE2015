@@ -1,8 +1,5 @@
 ### If you'd like to know more ...
 
-##### What is proportional representation?
-Proportional representation is an electoral system where each party gains seats in the parliament in proportion to the vote they receive. In simple proportional representation, a party that receives 10% of the vote gains 10% of the seats. By contrast, in the first-past-the-post system it is possible for a party to win more (or less) seats than the percentage of the vote they receive. In the 2011 federal elections, for example, the Conservative party won 54% of the seats despite having only 40% of the popular vote.
-
 ##### How are alternative parliaments calculated in this app?
 We took the election results from the last three federal elections and calculated the percentage of vote received by the Conservatives, Liberals, NDP, Bloc Québécois, and Green Party. Independent candidates and other parties were grouped together into an 'other' category. We then assigned seats to each party according the percentage of vote they received, rounding down. Any leftover seats were assigned to the party that won the most votes.
 
