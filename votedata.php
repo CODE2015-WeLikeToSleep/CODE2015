@@ -17,7 +17,7 @@ if ($mysqli->connect_errno) {
 }
 
 /* Prepared statement, stage 1: prepare */
-if (!($stmt = $mysqli->prepare("SELECT s.date, p.title, p.decision, p.con_yes, p.con_no, p.con_paired, " .
+if (!($stmt = $mysqli->prepare("SELECT s.date, p.bill_number, p.title, p.decision, p.con_yes, p.con_no, p.con_paired, " .
                                "p.lib_yes, p.lib_no, p.lib_paired, p.ndp_yes, p.ndp_no, p.ndp_paired, " .
                                "p.bqc_yes, p.bqc_no, p.bqc_paired, p.grp_yes, p.grp_no, p.grp_paired, " .
                                "p.otr_yes, p.otr_no, p.otr_paired" .
@@ -36,7 +36,7 @@ if (!$stmt->execute()) {
     echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
 }
 
-$stmt->bind_result($date, $title, $decision, $con_yes, $con_no, $con_paired, $lib_yes, $lib_no, $lib_paired,
+$stmt->bind_result($date, $bill, $title, $decision, $con_yes, $con_no, $con_paired, $lib_yes, $lib_no, $lib_paired,
                    $ndp_yes, $ndp_no, $ndp_paired, $bqc_yes, $bqc_no, $bqc_paired, $grp_yes,
                    $grp_no, $grp_paired, $otr_yes, $otr_no, $otr_paired);
 
@@ -46,6 +46,7 @@ while ($stmt->fetch()) {
                          'session' => $session,
                          'vote' => $vote,
                          'date' => $date,
+                         'bill' => $bill,
                          'title' => $title,
                          'decision' => $decision,
                          'details' => [['party' => 'conservative', 'yea' => $con_yes, 'nay'=> $con_no],
