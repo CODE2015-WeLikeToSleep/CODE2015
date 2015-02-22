@@ -18,7 +18,6 @@
     .leaves {
       background: url('images/leaves.jpeg') no-repeat center center;
       color: white;
-      margin-bottom: 2em;
     }
 
     .canyon {
@@ -69,7 +68,7 @@
         </p>
       </div>
 
-      <div class="" id="browse">
+      <div class="row" id="browse" style="padding: 3em; background-color: #BBBBBB;">
         <a class="anchor" name="browse"></a>
 
 <div style="border:1px solid black; display: block; width: 300px; margin-bottom: 1em;">
@@ -183,8 +182,8 @@ function populateCharts(parliament, session, vote) {
         appendParliamentRatios(parlForVote);
       var rescaledVote = scaleVote(partyVotes, alternateParliament);
 
-      renderPieVoteSummary('#chart1', partyVotes);
-      renderPieVoteSummary('#chart2', rescaledVote);
+      renderPieVoteSummary('#chart1', partyVotes, false);
+      renderPieVoteSummary('#chart2', rescaledVote, true);
 
       window.history.pushState({},"TITLE_NOT_IMPL", document.URL.replace(/#.*$/, "") + '#browse/'+parliament+'/'+session+'/'+vote);
     },

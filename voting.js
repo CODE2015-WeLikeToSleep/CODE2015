@@ -172,21 +172,21 @@ function pieDataFromVoteSummary(votesByParty) {
 	var results = [];
 	var partyColours = {
 		'NDP.yea': '#FF6600',
-		'NDP.nay': '#AAAAAA',
+		'NDP.nay': '#DDDDDD',
 		'Liberal.yea': '#DB0B27',
-		'Liberal.nay': '#BBBBBB',
+		'Liberal.nay': '#DDDDDD',
 		'Conservative.yea': '#144897',
-		'Conservative.nay': '#CCCCCC',
+		'Conservative.nay': '#DDDDDD',
 		'Green Party.yea': '#2D9C44',
 		'Green Party.nay': '#DDDDDD',
 		'Bloc Québécois.yea': '#0998F8',
-		'Bloc Québécois.nay': '#EEEEEE',
+		'Bloc Québécois.nay': '#DDDDDD',
 		'Forces et Démocratie.yea': 'red',
-		'Forces et Démocratie.nay': '#FFFFFF',
+		'Forces et Démocratie.nay': '#DDDDDD',
 		'Conservative Independent.yea': 'yellow',
-		'Conservative Independent.nay': '#CCCCCC',
+		'Conservative Independent.nay': '#DDDDDD',
 		'Independent.yea': 'yellow',
-		'Independent.nay': '#CCCCCC'
+		'Independent.nay': '#DDDDDD'
 	};
 	for (party in votesByParty) {
 		results.push({
@@ -209,12 +209,13 @@ function pieDataFromVoteSummary(votesByParty) {
  * Use D3.js to render a pie chart of a vote summary.
  * @param {String} elementSelector
  * @param {VoteSummary} voteSummary
+ * @param {boolean} reverse sort order
  */
-function renderPieVoteSummary(elementSelector, voteSummary) {
+function renderPieVoteSummary(elementSelector, voteSummary, reverse) {
 	var pieData = pieDataFromVoteSummary(voteSummary);
 
-	var width = 300;
-	var height = 300;
+	var width = 200;
+	var height = 200;
 	var radius = Math.min(width, height) / 2;
 
 	var svg = d3.select(elementSelector)
@@ -226,9 +227,23 @@ function renderPieVoteSummary(elementSelector, voteSummary) {
 	var arc = d3.svg.arc()
 		.outerRadius(radius);
 
+	if (reverse) {
+		var sortMultiple = -1;
+	} else {
+		var sortMultiple = 1;
+	}
+
 	var pie = d3.layout.pie()
 		.value(function(d) { return d.count; })
-		.sort(null);
+		.sort(function (a,b){
+			order1 = b.vote.localeCompare(a.vote) * sortMultiple;
+			order2 = b.party.localeCompare(a.party) * sortMultiple;
+			if (order1 != 0) {
+				return order1;
+			} else {
+				return order2;
+			}
+		});
 
 	var path = svg.selectAll('path')
 		.data(pie(pieData))
