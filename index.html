@@ -138,6 +138,8 @@ Vote
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script src="http://d3js.org/d3.v3.js"></script>
+<script src="Model.ChamberVoteDetail.js"></script>
+<script src="Model.Parliament.js"></script>
 <script src="voting.js"></script>
 <script>
 function populateVoteListing(parliament, session) {
@@ -174,32 +176,21 @@ function populateVoteListing(parliament, session) {
 }
 
 function populateCharts(parliament, session, vote) {
-  $.ajax({
-    type : 'GET',
-    url : 'data/parl'+parliament+'_sess'+session+'_vote'+vote+'.xml',
-    success : function(dataXML){
-      var data = voteJsonFromVoteXml(dataXML);
-      var partyVotes = summarizeVotesByParty(data);
-        appendParliamentRatios(alternateParliament);
-      var parlForVote = parliamentFromVotes(partyVotes);
-        appendParliamentRatios(parlForVote);
-      var rescaledVote = scaleVote(partyVotes, alternateParliament);
+  var chamberVote = new ChamberVoteDetail(parliament, session, vote);
+  // TODO: populate extra details from vote listing cache, or from the database
+  chamberVote.fetchXmlAsync(function(vote){
+    var rescaledVote = vote.newScaledVote(alternateParliament);
+    renderPieVoteSummary('#chart1', vote, false);
+    renderPieVoteSummary('#chart2', rescaledVote, true);
 
-      renderPieVoteSummary('#chart1', partyVotes, false);
-      renderPieVoteSummary('#chart2', rescaledVote, true);
-
-      // TODO: also render the full elected parliament
-      // maybe concentric rings could work for this?
-      renderParliament('#parlchart1', parlForVote);
-      renderParliament('#parlchart2', alternateParliament);
-
-      window.history.pushState({},"TITLE_NOT_IMPL", document.URL.replace(/#.*$/, "") + '#browse/'+parliament+'/'+session+'/'+vote);
-    },
-    error : function(){
-      //error handler..
-    }
+    // TODO: also render the full elected parliament
+    // maybe concentric rings could work for this?
+    var pTest = vote.getParliamentToday();
+    renderParliament('#parlchart1', pTest);
+    renderParliament('#parlchart2', alternateParliament);
   });
 
+  window.history.pushState({},"TITLE_NOT_IMPL", document.URL.replace(/#.*$/, "") + '#browse/'+parliament+'/'+session+'/'+vote);
 }
 
 $( document ).ready(function() {
