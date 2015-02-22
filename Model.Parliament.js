@@ -56,6 +56,7 @@ function fetchParliamentByYear(method, year, callback) {
 		'Bloc Quebecois': 'bloc quebecois',
 		'Green Party': 'green party',
 		'other': 'other',
+		'Independent': 'other',
 	};
 
 	var self = this;
@@ -72,8 +73,8 @@ function fetchParliamentByYear(method, year, callback) {
 				}
 				var partyName = partyNameTransform[value.party];
 				var allMethodResults = {};
-				allMethodResults[ElectoralMethod.FPTP] = value.fptp;
-				allMethodResults[ElectoralMethod.PR] = value.pr;
+				allMethodResults[ElectoralMethod.FPTP] = value.fptp + (allMethodResults[ElectoralMethod.FPTP] || 0);
+				allMethodResults[ElectoralMethod.PR] = value.pr + (allMethodResults[ElectoralMethod.PR] || 0);
 				parliament.parties[partyName] = {
 					party: partyName,
 					seats: allMethodResults[method]
