@@ -59,15 +59,17 @@
       </nav>
 
       <!-- Main component for a primary marketing message or call to action -->
-      <div class="row leaves" style="padding: 70px;">
+      <div class="row leaves" style="padding: 70px; font-size: 130%;">
         <h1>Healthy Voting</h1>
-        <p>Healthy living is important to you. Is it important to your elected representatives? What bills are being passed or failed? Would the results change in a different electoral system?</p>
+        <p>Healthy living is important to you. Is it important to your elected representatives? What bills are being passed or failed?</p>
+
+        <p>Would the results change if we used a different electoral system?</p>
         <p>
           <a class="btn btn-lg btn-primary" href="#browse" role="button">See Bills and Votes &raquo;</a>
         </p>
       </div>
 
-      <div class="" id="browse" style="height: 400px;">
+      <div class="" id="browse">
         <a class="anchor" name="browse"></a>
 
 <div style="border:1px solid black; display: block; width: 300px; margin-bottom: 1em;">
@@ -95,7 +97,6 @@ Vote
 
 <br>
 
-<span id="billdesc">No description</span>
 <svg id="chart1" class="chart"></svg>
 <svg id="chart2" class="chart"></svg>
 
@@ -143,7 +144,7 @@ function populateVoteListing(parliament, session) {
     $.each(voteListing, function(index, value) {
         $('#votelist').append($('<option/>', { 
             value: value.voteNumber,
-            text : value.bill,
+            text : value.voteNumber,
         }));
     });
   }
@@ -184,6 +185,8 @@ function populateCharts(parliament, session, vote) {
 
       renderPieVoteSummary('#chart1', partyVotes);
       renderPieVoteSummary('#chart2', rescaledVote);
+
+      window.history.pushState({},"TITLE_NOT_IMPL", document.URL.replace(/#.*$/, "") + '#browse/'+parliament+'/'+session+'/'+vote);
     },
     error : function(){
       //error handler..
@@ -193,9 +196,6 @@ function populateCharts(parliament, session, vote) {
 }
 
 $( document ).ready(function() {
-  populateVoteListing(41, 2);
-  populateCharts(41, 1, 1);
-
   $('select#parl_session').change(function(){
     var keys = $(this).val().split(',');
     var parliament = keys[0];
@@ -222,11 +222,31 @@ $( document ).ready(function() {
   $('#lnkPrev').click(function() {
     $('#votelist > option:selected')
       .prop('selected', false)
-      .previous()
+      .prev()
       .prop('selected', true);
     $('#votelist').trigger('change');
     return false; // disable page-scrolling behaviour of link
   });
+
+  var hash = window.location.hash;
+  var parliament = 41;
+  var session = 2;
+  var vote = 329;
+  if (hash.indexOf('#browse/') != -1) {
+    var params = hash.replace('#browse/', '').split('/');
+    parliament = params[0];
+    session = params[1];
+    vote = params[2];
+  }
+
+  $("#parl_session").val(parliament+','+session);
+  populateVoteListing(parliament, session);
+
+  // FIXME: setTimeout is a terrible way to do this.
+  setTimeout(function() {
+    $("#votelist").val(vote);
+    populateCharts(parliament, session, vote);
+  }, 1000);
 });
 </script>
 

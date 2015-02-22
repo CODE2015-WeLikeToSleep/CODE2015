@@ -105,7 +105,7 @@ function prettyPrintVote(votesByParty) {
 /**
  * Derive a new per-party voting outcome based on a hypothetical alternate parliament.
  * @param {VotesByParty} votesByParty
- * @param {Parliament} altParliament
+ * @param {VotesByParty}
  */
 function scaleVote(votesByParty, altParliament) {
 	// Calculate membership of the point-in-time parliament based on counted votes
@@ -115,6 +115,10 @@ function scaleVote(votesByParty, altParliament) {
 	// TODO: for..in only works because I'm constructing a trivial object.
 	// If it was a better object, I would need to use a better iterator.
 	for (party in votesByParty) {
+		if (typeof altParliament[party] == 'undefined') {
+			console.log("Party gap mismatch " + party);
+			continue;
+		}
 		var scaleFactor = altParliament[party]['influence'] / actualParliament[party]['influence'];
 		newVote[party] = {
 			yea: Math.round(votesByParty[party]['yea'] * scaleFactor),
@@ -165,14 +169,40 @@ function appendParliamentRatios(parliament) {
 function pieDataFromVoteSummary(votesByParty) {
 	var yea = 0;
 	var nay = 0;
+	var results = [];
+	var partyColours = {
+		'NDP.yea': '#FF6600',
+		'NDP.nay': '#AAAAAA',
+		'Liberal.yea': '#DB0B27',
+		'Liberal.nay': '#BBBBBB',
+		'Conservative.yea': '#144897',
+		'Conservative.nay': '#CCCCCC',
+		'Green Party.yea': '#2D9C44',
+		'Green Party.nay': '#DDDDDD',
+		'Bloc Québécois.yea': '#0998F8',
+		'Bloc Québécois.nay': '#EEEEEE',
+		'Forces et Démocratie.yea': 'red',
+		'Forces et Démocratie.nay': '#FFFFFF',
+		'Conservative Independent.yea': 'yellow',
+		'Conservative Independent.nay': '#CCCCCC',
+		'Independent.yea': 'yellow',
+		'Independent.nay': '#CCCCCC'
+	};
 	for (party in votesByParty) {
-		yea += votesByParty[party].yea;
-		nay += votesByParty[party].nay;
+		results.push({
+			party: party,
+			vote: 'yea',
+			count: votesByParty[party].yea,
+			colour: partyColours[party + '.yea'],
+		});
+		results.push({
+			party: party,
+			vote: 'nay',
+			count: votesByParty[party].nay,
+			colour: partyColours[party + '.nay'],
+		});
 	}
-	return [
-		{vote: 'yea', count: yea, colour: 'green'},
-		{vote: 'nay', count: nay, colour: 'lightgray'},
-	];
+	return results;
 }
 
 /**
@@ -183,8 +213,8 @@ function pieDataFromVoteSummary(votesByParty) {
 function renderPieVoteSummary(elementSelector, voteSummary) {
 	var pieData = pieDataFromVoteSummary(voteSummary);
 
-	var width = 250;
-	var height = 250;
+	var width = 300;
+	var height = 300;
 	var radius = Math.min(width, height) / 2;
 
 	var svg = d3.select(elementSelector)
@@ -197,6 +227,7 @@ function renderPieVoteSummary(elementSelector, voteSummary) {
 		.outerRadius(radius);
 
 	var pie = d3.layout.pie()
+		.startAngle(45)
 		.value(function(d) { return d.count; })
 		.sort(null);
 
@@ -205,13 +236,15 @@ function renderPieVoteSummary(elementSelector, voteSummary) {
 		.enter()
 		.append('path')
 		.attr('d', arc)
-		.attr('fill', function f(d,i){return d.data.colour;});
+		.attr('class', function(d,i){return d.data.party;})
+		.attr('fill', function(d,i){return d.data.colour;});
 }
 
 // Right now, this alternate parliament is completely imaginary.
 // TODO: We will derive a hypothetical parliament by applying an alternate electoral
 // system to the per-riding elections data (will be obtained elsewhere).
 var alternateParliament = {
+	'Forces et Démocratie': {seats: 0},
 	'Bloc Québécois': {seats: 6},
 	'Conservative': {seats: 139},
 	'Conservative Independent': {seats: 8},
