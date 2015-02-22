@@ -17,12 +17,14 @@ if ($mysqli->connect_errno) {
 }
 
 /* Prepared statement, stage 1: prepare */
-if (!($stmt = $mysqli->prepare("SELECT decision, con_yes, con_no, con_paired, " .
-                               "lib_yes, lib_no, lib_paired, ndp_yes, ndp_no, ndp_paired, " .
-                               "bqc_yes, bqc_no, bqc_paired, grp_yes, grp_no, grp_paired, " .
-                               "otr_yes, otr_no, otr_paired" .
-                               " FROM parliament_votes " .
-                               " WHERE parl_number=? AND session_number=? AND vote_number=?"))) {
+if (!($stmt = $mysqli->prepare("SELECT s.date, p.title, p.decision, p.con_yes, p.con_no, p.con_paired, " .
+                               "p.lib_yes, p.lib_no, p.lib_paired, p.ndp_yes, p.ndp_no, p.ndp_paired, " .
+                               "p.bqc_yes, p.bqc_no, p.bqc_paired, p.grp_yes, p.grp_no, p.grp_paired, " .
+                               "p.otr_yes, p.otr_no, p.otr_paired" .
+                               " FROM parliament_votes p, vote_summaries s" .
+                               " WHERE p.parl_number=? AND p.session_number=? AND p.vote_number=?" .
+                               " AND p.parl_number=s.parl_number AND p.session_number=s.session_number " .
+                               "AND p.vote_number=s.vote_number"))) {
     echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 }
 
@@ -34,7 +36,7 @@ if (!$stmt->execute()) {
     echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
 }
 
-$stmt->bind_result($decision, $con_yes, $con_no, $con_paired, $lib_yes, $lib_no, $lib_paired,
+$stmt->bind_result($date, $title, $decision, $con_yes, $con_no, $con_paired, $lib_yes, $lib_no, $lib_paired,
                    $ndp_yes, $ndp_no, $ndp_paired, $bqc_yes, $bqc_no, $bqc_paired, $grp_yes,
                    $grp_no, $grp_paired, $otr_yes, $otr_no, $otr_paired);
 
@@ -43,6 +45,8 @@ while ($stmt->fetch()) {
     $json = json_encode(['parliament' => $parliament,
                          'session' => $session,
                          'vote' => $vote,
+                         'date' => $date,
+                         'title' => $title,
                          'decision' => $decision,
                          'details' => [['party' => 'conservative', 'yea' => $con_yes, 'nay'=> $con_no],
                                        ['party' => 'liberal', 'yea' => $lib_yes, 'nay'=> $lib_no],
