@@ -10,7 +10,7 @@ $parliament = $_GET["p"];
 $session = $_GET["s"];
 $vote = $_GET["v"];
 
-$mysqli = new mysqli("localhost", "root", "Dra333Gon", "code");  // FIXME: change user etc.
+$mysqli = new mysqli("localhost", "root", "code2015", "code2015");
 
 if ($mysqli->connect_errno) {
     echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
