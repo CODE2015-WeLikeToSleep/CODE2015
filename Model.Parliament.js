@@ -66,6 +66,7 @@ function fetchParliamentByYear(method, year, callback) {
 			var parliament = new Parliament();
 			dataJSON.forEach(function(value,ix,array){
 				if (typeof partyNameTransform[value.party] == "undefined") {
+					console.log('missing transform for ' + value.party);
 					return; // just skip parties we don't care about.
 				}
 				var partyName = partyNameTransform[value.party];
