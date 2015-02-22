@@ -8,9 +8,8 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
     <title>Healthy Voting</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-        <link href="carousel.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootswatch/3.2.0/cerulean/bootstrap.min.css">
+    <link rel="stylesheet" href="css/parliament.css">
     <style type="text/css">
     html {
       margin: 0;
@@ -20,7 +19,6 @@
     .leaves {
       background: url('images/leaves.jpeg') no-repeat center center;
       color: white;
-      text-shadow: 0 1px 2px rgba(0,0,0,.6);
     }
 
     .canyon {
@@ -71,36 +69,6 @@
         </p>
       </div>
 
-    <!-- Carousel
-    ================================================== -->
-    <div id="myCarousel" class="row leaves carousel slide" data-ride="carousel">
-      <!-- Indicators -->
-      <ol class="carousel-indicators" id="carouselIndicatorList">
-        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-      </ol>
-      <div class="carousel-inner" role="listbox" id="innerCarousel">
-        <div class="item active">
-          <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="First slide">
-          <div class="container">
-            <div class="carousel-caption">
-              <h1>Featured Bills</h1>
-              <p>Scroll through these featured bills.</p>
-              <!--<p><a class="btn btn-lg btn-primary" href="#" role="button">View Outcome</a></p>-->
-            </div>
-          </div>
-        </div>
-        <!-- this is filled by javascript -->
-      </div>
-      <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
-    </div><!-- /.carousel -->
-
       <div class="row" id="browse" style="padding: 3em; background-color: #BBBBBB;">
         <a class="anchor" name="browse"></a>
 
@@ -112,40 +80,114 @@
 <svg id="parlchart2" class="chart"></svg>
 </div>
 
-Parliament/Session
-<select id="parl_session">
-  <option value="41,2">41st Parliament, 2nd Session</option>
-  <option value="41,1">41st Parliament, 1st Session</option>
-  <option value="40,3">40th Parliament, 3rd Session</option>
-  <option value="40,2">40th Parliament, 2nd Session</option>
-  <!-- the 40th parliament, 1st session is dumb and has no real bills. -->
-  <!--<option value="40,1">40th Parliament, 1st Session</option>-->
-  <option value="39,2">39th Parliament, 2nd Session</option>
-  <option value="39,1">39th Parliament, 1st Session</option>
-</select>
+<div id="parl_wrapper">
 
-Vote
-<select id="votelist">
-</select>
-<a id="lnkPrev" href="#">Previous</a>
-<a id="lnkNext" href="#">Next</a>
+    <div>
+        <h1>Parliament/Session</h1>
+        <select id="parl_session" onchange="setDuration(this.options[this.selectedIndex].value)">
+            <option value="41,2">41st Parliament, 2nd Session</option>
+            <option value="41,1">41st Parliament, 1st Session</option>
+            <option value="40,3">40th Parliament, 3rd Session</option>
+            <option value="40,2">40th Parliament, 2nd Session</option>
+            <!-- the 40th parliament, 1st session is dumb and has no real bills. -->
+            <!--<option value="40,1">40th Parliament, 1st Session</option>-->
+            <option value="39,2">39th Parliament, 2nd Session</option>
+            <option value="39,1">39th Parliament, 1st Session</option>
+        </select>
+    </div>
+
+    <script>
+        function setDuration(s) {
+
+            dur = ""
+
+            switch (s) {
+                case "41,2":
+                    dur = "2013.10.16 - 2015.02.19";
+                    break;
+                case "41,1":
+                    dur = "2011.06.02 - 2013.09.13";
+                    break;
+                case "40,3":
+                    dur = "2010.03.03 - 2011.03.25";
+                    break;
+                case "40,2":
+                    dur = "2009.01.26 - 2009.12.30";
+                    break;
+                case "39,2":
+                    dur = "2007.10.16 - 2008.06.20";
+                    break;
+                case "39,1":
+                    dur = "2006.04.03 - 2007.09.14";
+                    break;
+            }
+
+            $('#parl_duration').text(dur);
+        }
+    </script>
+
+    <h1>Duration: </h1> <div id="parl_duration"></div><br>
+
+</div>
+
+<div id="vote_wrapper">
+    <h1>Vote: </h1><a id="lnkPrev" href="#">&#8656; </a><select id="votelist"></select><a id="lnkNext" href="#"> &#8658;</a><br>
+    <h1>Bill: </h1><span id="bill_name"></span><br>
+    <h1>Title: </h1><span id="desctext"></span><br>
+</div>
 
 <br>
+<div id="vote_chart_wrapper">
+    <div class="vote_chart">
+        <h1>First Past the Post</h1><br>
+        <svg id="chart1" class="chart"></svg>
+    </div>
+    <div class="vote_chart">
+        <h1>Proportional Representation</h1><br>
+        <svg id="chart2" class="chart"></svg>
+    </div>
+    <div class="vote_chart" style="text-align: left;">
+        <h1 style="text-align:left;">Legend</h1><br>
+        <table id="chart_legend">
+            <tr>
+                <td class="legend_colour conservative">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Conservative</td>
+            </tr>
+            <tr>
+                <td class="legend_colour ndp">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>NDP</td>
+            </tr>
+            <tr>
+                <td class="legend_colour liberals">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Liberals</td>
+            </tr>
 
-<svg id="chart1" class="chart"></svg>
-<svg id="chart2" class="chart"></svg>
+            <tr>
+                <td class="legend_colour greenparty">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Green Party</td>
+            </tr>
+            <tr>
+                <td class="legend_colour bloc">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Bloc Quebecois</td>
+            </tr>
+            <tr>
+                <td class="legend_colour other">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Other</td>
+            </tr>
+        </table>
+    </div>
 
-<span id="billnumber"></span>
-<span id="desctext"></span>
-<span id="summarytext"></span>
+</div>
 
       </div>
 
       <div class="row canyon" id="representation" style="padding: 70px; font-size: 130%;">
-            <a class="anchor" name="representation"></a>
-            <p>What is proportional representation?</p>
-            <p>Proportional representation is an electoral system where each party gains seats in the parliament in proportion to the vote they receive. In simple proportional representation, a party that receives 10% of the vote gains 10% of the seats. By contrast, in the first-past-the-post system it is possible for a party to win more (or less) seats than the percentage of the vote they receive. In the 2011 federal elections, for example, the Conservative party won 54% of the seats despite having only 40% of the popular vote.</p>
-            <p>If you'd like to know more about our app, please see the documentation <a href="https://github.com/CODE2015-WeLikeToSleep/CODE2015/blob/master/README.md">here.</a></p>
+        <a class="anchor" name="representation"></a>
+        <p>Proportional representation is a system used to elect a country's government. If proportional representation is used in an election, a political party that wins 10% of the vote, will win 10% of the seats in parliament and a party that wins 20% of the vote, will win 20% of the seats.</p>
+
+        <p>If a party wins over 50% of the vote, it wins over 50% of the seats and can form a government, however this does not happen very often because most countries have lots of different political parties. If no party wins over 50% of the vote, then a coalition government usually has to be formed, where a government is formed from two or more different political parties, who together have over 50% of the seats in parliament.</p>
+
+        <p>Source: <a style="color: skyblue;" href="http://simple.wikipedia.org/wiki/Proportional_representation">Proportional Representation on Wikipedia</a></p>
       </div>
 
       <div class="" id="aboutCODE">
@@ -157,13 +199,15 @@ Vote
 
         <p>Team: We Like To Sleep</p>
 
-        <p>Theme: Healthy living</p>
+        <p>relation to theme of 'healthy living'?</p>
 
-        <p>Data:
-          <br>Federal election results for <a href="http://open.canada.ca/data/en/dataset/d62cf7b7-c180-4115-b0a6-546a85d6419f">2006</a>, <a href="http://open.canada.ca/data/en/dataset/d356c792-5cb0-46c1-be74-a86f804a0e93">2008</a>, <a href="http://open.canada.ca/data/en/dataset/b1fabdfd-72c5-42b0-a07e-a04e0148f7a4">2011</a>
-          <br><a href="http://www.parl.gc.ca/HouseChamberBusiness/ChamberVoteList.aspx?Language=E&Mode=1&Parl=41&Ses=2">
-          House of Commons, Parliamentary Business</a>
-        </p>
+        <p>open data sets?</p>
+
+        <p><a href="http://www.parl.gc.ca/HouseChamberBusiness/ChamberVoteList.aspx?Language=E&Mode=1&Parl=41&Ses=2">
+          House of Commons, Parliamentary Business
+        </a></p>
+
+        <p>innovation?</p>
       </div>
 
     </div> <!-- /container -->
@@ -175,37 +219,6 @@ Vote
 <script src="Model.Parliament.js"></script>
 <script src="voting.js"></script>
 <script>
-
-billSummaries = {
-    '41.2.371': 'This enactment provides that the Minister of Health must establish a national strategy to reduce the health effects of urban heat islands.',
-    '41.2.61': 'This enactment amends the Department of Health Act to oblige drug suppliers to advise the Minister of any interruption of the production, distribution, or importation of drugs.',
-    '39.1.164': 'This enactment extends the maximum period for which benefits for illness, injury or quarantine may be paid from fifteen weeks to fifty weeks.',
-    '39.2.29': 'The purpose of this enactment is to require alcoholic beverages to bear a warning regarding possible health effects and effects on the ability to operate vehicles and machinery.',
-    '41.1.515': 'This enactment amends the Patent Act to make it easier to manufacture and export pharmaceutical products to address public health problems afflicting many developing and least-developed countries.',
-    '39.1.61': 'This enactment specifies the type of information that is to be provided on the labels of imported and prepackaged food and food sold for immediate consumption.',
-    '40.3.76': 'This enactment establishes the Canadian Environmental Bill of Rights with the aim to safeguard the right of present and future generations of Canadians to a healthy and ecologically balanced environment.',
-    '41.1.172': 'The purpose of this Act is to foster the sustainable use of Canada’s water resources and, in particular, to prevent the removal of water in bulk from major drainage basins in Canada.',
-    '41.1.742': 'This enactment addresses health and safety issues on reserve lands and certain other lands by providing for regulations to govern drinking water and waste water treatment in First Nations communities.'
-}
-
-var cIndex = 1;
-for (featureKey in billSummaries) {
-  var summaryText = billSummaries[featureKey];
-  var anchorFragment = featureKey.replace(/\./g, '/');
-  var linkUrl = document.URL.replace(/#.*$/, "") + '#browse/'+anchorFragment
-  var newElement = '<div class="item"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAFVVVQAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="><div class="container"><div class="carousel-caption"><h1>'+featureKey+'</h1><p>'+summaryText+'</p><p><a class="btn btn-lg btn-primary" href="'+linkUrl+'" role="button">View Outcome</a></p></div></div></div>';
-  $("#innerCarousel").append(newElement);
-
-  $('#carouselIndicatorList').append('<li data-target="#myCarousel" data-slide-to="'+cIndex+'"></li>');
-  cIndex += 1;
-}
-
-var foo = $('#innerCarousel .item .container .carousel-caption a.btn-primary');
-foo.click(function(){
-  jumpHash = '#browse/'+$(this).attr('href').replace(/^.*#browse\//, "");
-  browseJump(jumpHash);
-});
-
 function populateVoteListing(parliament, session) {
   function doPopulateVoteListing(voteListing) {
     $('#votelist').empty();
@@ -243,54 +256,25 @@ function populateCharts(parliament, session, vote) {
   var chamberVote = new ChamberVoteDetail(parliament, session, vote);
 
   // TODO: populate extra details from vote listing cache, or from the database
-  //chamberVote.description = 'description';
-  //chamberVote.bill = 'bill';
+  chamberVote.description = 'description';
+  chamberVote.bill = 'bill';
 
-  chamberVote.fetchAsync(function(voteObject){
-    var rescaledVote = voteObject.newScaledVote(alternateParliament);
-    renderPieVoteSummary('#chart1', voteObject, false);
+  chamberVote.fetchAsync(function(vote){
+    var rescaledVote = vote.newScaledVote(alternateParliament);
+    renderPieVoteSummary('#chart1', vote, false);
     renderPieVoteSummary('#chart2', rescaledVote, true);
 
     // TODO: also render the full elected parliament
     // maybe concentric rings could work for this?
-    var pTest = voteObject.getParliamentToday();
+    var pTest = vote.getParliamentToday();
     renderParliament('#parlchart1', pTest);
     renderParliament('#parlchart2', alternateParliament);
-    //renderParliamentComparison('#parlchart1', pTest, alternateParliament);
 
-    $('#desctext').text(voteObject.description || '');
-    $('#billnumber').text(voteObject.bill || '');
-    $('#summarytext').text(billSummaries[parliament+'.'+session+'.'+vote] || '');
+    $('#desctext').text(vote.description);
+    $('#bill_name').text(vote.bill);
   });
 
-  var browseHash = parliament+'/'+session+'/'+vote;
-  console.log('pushing url state ' + browseHash);
-  window.history.pushState({},"TITLE_NOT_IMPL", document.URL.replace(/#.*$/, "") + '#browse/'+browseHash);
-}
-
-function browseJump(hash) {
-  console.log('jumping to:' + hash);
-  //var hash = window.location.hash;
-  var parliament = 41;
-  var session = 2;
-  var vote = 329;
-  if (hash.indexOf('#browse/') != -1) {
-    var params = hash.replace('#browse/', '').split('/');
-    parliament = params[0];
-    session = params[1];
-    vote = params[2];
-  }
-
-  $("#parl_session").val(parliament+','+session);
-  populateVoteListing(parliament, session);
-
-  // FIXME: setTimeout is a terrible way to do this.
-  setTimeout(function() {
-    $("#votelist").val(vote);
-    populateCharts(parliament, session, vote);
-  }, 1000);
-
-  $(document).scrollTop( $("#browse").offset().top );  
+  window.history.pushState({},"TITLE_NOT_IMPL", document.URL.replace(/#.*$/, "") + '#browse/'+parliament+'/'+session+'/'+vote);
 }
 
 $( document ).ready(function() {
@@ -326,7 +310,25 @@ $( document ).ready(function() {
     return false; // disable page-scrolling behaviour of link
   });
 
-  browseJump(window.location.hash);
+  var hash = window.location.hash;
+  var parliament = 41;
+  var session = 2;
+  var vote = 329;
+  if (hash.indexOf('#browse/') != -1) {
+    var params = hash.replace('#browse/', '').split('/');
+    parliament = params[0];
+    session = params[1];
+    vote = params[2];
+  }
+
+  $("#parl_session").val(parliament+','+session);
+  populateVoteListing(parliament, session);
+
+  // FIXME: setTimeout is a terrible way to do this.
+  setTimeout(function() {
+    $("#votelist").val(vote);
+    populateCharts(parliament, session, vote);
+  }, 1000);
 });
 </script>
 
