@@ -135,7 +135,11 @@ ChamberVoteDetail.prototype.newScaledVote = function(altParliament) {
 			console.log("Party gap mismatch " + party);
 			return;
 		}
-		var scaleFactor = altParliament.parties[party]['influence'] / actualParliament.parties[party]['influence'];
+		if (actualParliament.parties[party]['influence'] == 0) {
+			var scaleFactor = 0;
+		} else {
+			var scaleFactor = altParliament.parties[party]['influence'] / actualParliament.parties[party]['influence'];
+		}
 		var adjustedCount = Math.round(value.count * scaleFactor);
 		//console.log(altParliament.parties[party]);
 		newVote.votes.push(new PartyVoteCount(value.party, value.voteType, adjustedCount));
