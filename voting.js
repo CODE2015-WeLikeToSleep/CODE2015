@@ -255,3 +255,6 @@ alternateParliament.parties = {
 	'liberal': {seats: 44},
 	'ndp': {seats: 108}
 };
+fetchParliamentByNumber(ElectoralMethod.FPTP,41,function(value){
+	console.log(value);
+});
