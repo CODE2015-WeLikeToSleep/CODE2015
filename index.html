@@ -79,6 +79,8 @@
 <svg id="parlchart2" class="chart"></svg>
 </div>
 
+<span id="desctext"></span>
+
 Parliament/Session
 <select id="parl_session">
   <option value="41,2">41st Parliament, 2nd Session</option>
@@ -177,7 +179,11 @@ function populateVoteListing(parliament, session) {
 
 function populateCharts(parliament, session, vote) {
   var chamberVote = new ChamberVoteDetail(parliament, session, vote);
+
   // TODO: populate extra details from vote listing cache, or from the database
+  chamberVote.description = 'description';
+  chamberVote.bill = 'bill';
+
   chamberVote.fetchXmlAsync(function(vote){
     var rescaledVote = vote.newScaledVote(alternateParliament);
     renderPieVoteSummary('#chart1', vote, false);
@@ -188,6 +194,8 @@ function populateCharts(parliament, session, vote) {
     var pTest = vote.getParliamentToday();
     renderParliament('#parlchart1', pTest);
     renderParliament('#parlchart2', alternateParliament);
+
+    $('#desctext').text(vote.description);
   });
 
   window.history.pushState({},"TITLE_NOT_IMPL", document.URL.replace(/#.*$/, "") + '#browse/'+parliament+'/'+session+'/'+vote);
