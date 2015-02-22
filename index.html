@@ -211,9 +211,9 @@ function populateCharts(parliament, session, vote) {
     renderParliament('#parlchart2', alternateParliament);
     //renderParliamentComparison('#parlchart1', pTest, alternateParliament);
 
-    $('#desctext').text(voteObject.description);
-    $('#billnumber').text(voteObject.bill);
-    $('#summarytext').text(billSummaries[parliament+'.'+session+'.'+vote]);
+    $('#desctext').text(voteObject.description || '');
+    $('#billnumber').text(voteObject.bill || '');
+    $('#summarytext').text(billSummaries[parliament+'.'+session+'.'+vote] || '');
   });
 
   window.history.pushState({},"TITLE_NOT_IMPL", document.URL.replace(/#.*$/, "") + '#browse/'+parliament+'/'+session+'/'+vote);
