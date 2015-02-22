@@ -189,22 +189,23 @@ function populateCharts(parliament, session, vote) {
   var chamberVote = new ChamberVoteDetail(parliament, session, vote);
 
   // TODO: populate extra details from vote listing cache, or from the database
-  chamberVote.description = 'description';
-  chamberVote.bill = 'bill';
+  //chamberVote.description = 'description';
+  //chamberVote.bill = 'bill';
 
-  chamberVote.fetchAsync(function(vote){
-    var rescaledVote = vote.newScaledVote(alternateParliament);
-    renderPieVoteSummary('#chart1', vote, false);
+  chamberVote.fetchAsync(function(voteObject){
+    var rescaledVote = voteObject.newScaledVote(alternateParliament);
+    renderPieVoteSummary('#chart1', voteObject, false);
     renderPieVoteSummary('#chart2', rescaledVote, true);
 
     // TODO: also render the full elected parliament
     // maybe concentric rings could work for this?
-    var pTest = vote.getParliamentToday();
+    var pTest = voteObject.getParliamentToday();
     renderParliament('#parlchart1', pTest);
     renderParliament('#parlchart2', alternateParliament);
+    //renderParliamentComparison('#parlchart1', pTest, alternateParliament);
 
-    $('#desctext').text(vote.description);
-    $('#billnumber').text(vote.bill);
+    $('#desctext').text(voteObject.description);
+    $('#billnumber').text(voteObject.bill);
     $('#summarytext').text(billSummaries[parliament+'.'+session+'.'+vote]);
   });
 
