@@ -242,22 +242,3 @@ function renderParliament(elementSelector, parliament) {
 		.attr('dy', function(d,i){return 15+i*barwidth})
 		.attr('fill', 'black');
 }
-
-// Right now, this alternate parliament is completely imaginary.
-// TODO: We will derive a hypothetical parliament by applying an alternate electoral
-// system to the per-riding elections data (will be obtained elsewhere).
-var alternateParliament = new Parliament();
-alternateParliament.parties = {
-	'bloc quebecois': {seats: 6},
-	'conservative': {seats: 139},
-	'green party': {seats: 8},
-	'other': {seats: 14},
-	'liberal': {seats: 44},
-	'ndp': {seats: 108}
-};
-fetchParliamentByNumber(ElectoralMethod.FPTP,41,function(value){
-	console.log(value);
-});
-fetchParliamentByNumber(ElectoralMethod.PR,41,function(value){
-	console.log(value);
-});

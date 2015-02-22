@@ -106,8 +106,6 @@
         <a class="anchor" name="browse"></a>
 
 <div style="border:1px solid black; display: block; margin-bottom: 1em;">
-  show the arrangement of actual and hypothetical parliament
-  based on current selection of parliament<br>
 
 <svg id="parlchart1" class="chart"></svg>
 <svg id="parlchart2" class="chart"></svg>
@@ -280,6 +278,13 @@ foo.click(function(){
 });
 
 function populateVoteListing(parliament, session) {
+  fetchParliamentByNumber(ElectoralMethod.FPTP,parliament,function(value){
+    parl_fptp = value;
+  });
+  fetchParliamentByNumber(ElectoralMethod.PR,parliament,function(value){
+    parl_pr = value;
+  });
+
   function doPopulateVoteListing(voteListing) {
     $('#votelist').empty();
     $.each(voteListing, function(index, value) {
@@ -320,15 +325,15 @@ function populateCharts(parliament, session, vote) {
   chamberVote.bill = 'bill';
 
   chamberVote.fetchAsync(function(vote){
-    var rescaledVote = vote.newScaledVote(alternateParliament);
+    var rescaledVote = vote.newScaledVote(parl_pr);
     renderPieVoteSummary('#chart1', vote, false);
     renderPieVoteSummary('#chart2', rescaledVote, true);
 
     // TODO: also render the full elected parliament
     // maybe concentric rings could work for this?
     var pTest = vote.getParliamentToday();
-    renderParliament('#parlchart1', pTest);
-    renderParliament('#parlchart2', alternateParliament);
+    renderParliament('#parlchart1', parl_fptp);
+    renderParliament('#parlchart2', parl_pr);
 
     $('#desctext').text(vote.description);
     $('#bill_name').text(vote.bill);
