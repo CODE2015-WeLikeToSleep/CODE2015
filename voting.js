@@ -103,6 +103,7 @@ function renderPieVoteSummary(elementSelector, chamberVoteDetail, reverse) {
 		.attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')');
 
 	var arc = d3.svg.arc()
+		.innerRadius(radius*0.4)
 		.outerRadius(radius);
 
 	if (reverse) {
