@@ -10,6 +10,7 @@ function Parliament() {
  * @return {Parliament} parliament
  */
 Parliament.prototype.appendRatios = function appendParliamentRatios(parliament) {
+	var self = this;
 	var totalSeats = 0;
 	var goodParties = [];
 	for (party in this.parties) {
@@ -24,6 +25,6 @@ Parliament.prototype.appendRatios = function appendParliamentRatios(parliament) 
 	}
 	goodParties.forEach(function(value,ix,array){
 		var party = value;
-		this.parties[party]['influence'] = this.parties[party]['seats'] / totalSeats;
+		self.parties[party]['influence'] = self.parties[party]['seats'] / totalSeats;
 	});
 }
