@@ -137,6 +137,51 @@ function renderPieVoteSummary(elementSelector, chamberVoteDetail, reverse) {
  * @param {String} elementSelector
  * @param {Parliament} parliament
  */
+function renderParliamentComparison(elementSelector, p1, p2) {
+	var chartData = [];
+
+	// A parliament is a hash, not an array. But D3.js can ONLY read arrays. so we make an array
+	[p1, p2].forEach(function(parliament,ix,array){
+		for (party in parliament.parties) {
+			chartData.push({
+				party: party,
+				set: ix,
+				seats: parliament.parties[party].seats,
+			});
+		}
+	});
+
+	chartData.sort(function(a,b) {
+		//return a.party.localeCompare(b.party);
+		return partySortIndex[a.party] - partySortIndex[b.party];
+	});
+
+	console.log(chartData);
+
+	var width = 200;
+	var height = 200;
+
+	var svg = d3.select(elementSelector)
+		.attr("width", width)
+		.attr("height", height);
+
+	var rect = svg.selectAll('rect')
+		.data(chartData)
+		.enter()
+		.append('rect')
+		.attr('transform', function(d, i) { return "translate(0," + i * 20 + ")"; })
+		.attr('y', function(d,i){return -10 * d.set})
+		.attr('width', function(d,i){return d.seats;})
+		.attr('height', 10)
+		.attr('class', 'rectclass')
+		.attr('fill', function(d,i){return partyColours[d.party+'.YEA'];});
+}
+
+/**
+ * Use D3.js to draw the composition of a parliament.
+ * @param {String} elementSelector
+ * @param {Parliament} parliament
+ */
 function renderParliament(elementSelector, parliament) {
 	// A parliament is a hash, not an array. But D3.js can ONLY read arrays. so we make an array.
 	var chartData = Object.keys(parliament.parties).map(function(cur,ix,array) {
