@@ -1,0 +1,89 @@
+#parl_wrapper {
+    margin-bottom: 10px;
+    background-color: white;
+    border: 1px solid black;
+    border-left: 5px solid black;
+    padding: 5px
+}
+
+#parl_duration {
+    display: inline-block;
+}
+
+#parl_wrapper h1 {
+    display: inline-block;
+    font-size: 14px;
+    width: 150px;
+    margin: 0;
+    padding:0;
+}
+
+#vote_wrapper {
+
+    background-color: white;
+    border: 1px solid black;
+    border-left: 5px solid black;
+    padding: 5px
+}
+
+#vote_wrapper h1 {
+    display: inline-block;
+    font-size: 14px;
+    width: 150px;
+    margin: 0;
+    padding:0;
+}
+
+#vote_wrapper select {
+    width: 80px;
+}
+
+#vote_chart_wrapper {
+    margin-bottom: 10px;
+    background-color: white;
+    border: 1px solid black;
+    border-left: 5px solid black;
+    padding: 5px
+}
+
+.vote_chart {
+
+    display: table-cell;
+    width: 400px;
+    text-align: center;
+}
+
+#chart_legend td {
+    padding: 1px;
+}
+
+#vote_chart_wrapper h1 {
+    width: 400px;
+    font-size: 14px;
+    text-align: center;
+}
+
+
+.legend_colour.conservative {
+    background-color: #144897;
+}
+
+.legend_colour.ndp {
+    background-color: #FF6600;
+}
+
+.legend_colour.greenparty {
+    background-color: #2D9C44;
+}
+
+.legend_colour.liberals {
+    background-color: #DB0B27;
+}
+
+.legend_colour.bloc {
+    background-color: #0998F8;
+}
+
+.legend_colour.other {
+    background-color: purple;
+}

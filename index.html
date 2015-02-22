@@ -8,7 +8,8 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
     <title>Healthy Voting</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootswatch/3.2.0/cerulean/bootstrap.min.css">
+    <link rel="stylesheet" href="css/parliament.css">
     <style type="text/css">
     html {
       margin: 0;
@@ -79,40 +80,114 @@
 <svg id="parlchart2" class="chart"></svg>
 </div>
 
-Parliament/Session
-<select id="parl_session">
-  <option value="41,2">41st Parliament, 2nd Session</option>
-  <option value="41,1">41st Parliament, 1st Session</option>
-  <option value="40,3">40th Parliament, 3rd Session</option>
-  <option value="40,2">40th Parliament, 2nd Session</option>
-  <!-- the 40th parliament, 1st session is dumb and has no real bills. -->
-  <!--<option value="40,1">40th Parliament, 1st Session</option>-->
-  <option value="39,2">39th Parliament, 2nd Session</option>
-  <option value="39,1">39th Parliament, 1st Session</option>
-</select>
+<div id="parl_wrapper">
 
-Vote
-<select id="votelist">
-</select>
-<a id="lnkPrev" href="#">Previous</a>
-<a id="lnkNext" href="#">Next</a>
+    <div>
+        <h1>Parliament/Session</h1>
+        <select id="parl_session" onchange="setDuration(this.options[this.selectedIndex].value)">
+            <option value="41,2">41st Parliament, 2nd Session</option>
+            <option value="41,1">41st Parliament, 1st Session</option>
+            <option value="40,3">40th Parliament, 3rd Session</option>
+            <option value="40,2">40th Parliament, 2nd Session</option>
+            <!-- the 40th parliament, 1st session is dumb and has no real bills. -->
+            <!--<option value="40,1">40th Parliament, 1st Session</option>-->
+            <option value="39,2">39th Parliament, 2nd Session</option>
+            <option value="39,1">39th Parliament, 1st Session</option>
+        </select>
+    </div>
+
+    <script>
+        function setDuration(s) {
+
+            dur = ""
+
+            switch (s) {
+                case "41,2":
+                    dur = "2013.10.16 - 2015.02.19";
+                    break;
+                case "41,1":
+                    dur = "2011.06.02 - 2013.09.13";
+                    break;
+                case "40,3":
+                    dur = "2010.03.03 - 2011.03.25";
+                    break;
+                case "40,2":
+                    dur = "2009.01.26 - 2009.12.30";
+                    break;
+                case "39,2":
+                    dur = "2007.10.16 - 2008.06.20";
+                    break;
+                case "39,1":
+                    dur = "2006.04.03 - 2007.09.14";
+                    break;
+            }
+
+            $('#parl_duration').text(dur);
+        }
+    </script>
+
+    <h1>Duration: </h1> <div id="parl_duration"></div><br>
+
+</div>
+
+<div id="vote_wrapper">
+    <h1>Vote: </h1><a id="lnkPrev" href="#">&#8656; </a><select id="votelist"></select><a id="lnkNext" href="#"> &#8658;</a><br>
+    <h1>Bill: </h1><span id="bill_name"></span><br>
+    <h1>Title: </h1><span id="desctext"></span><br>
+</div>
 
 <br>
+<div id="vote_chart_wrapper">
+    <div class="vote_chart">
+        <h1>First Past the Post</h1><br>
+        <svg id="chart1" class="chart"></svg>
+    </div>
+    <div class="vote_chart">
+        <h1>Proportional Representation</h1><br>
+        <svg id="chart2" class="chart"></svg>
+    </div>
+    <div class="vote_chart" style="text-align: left;">
+        <h1 style="text-align:left;">Legend</h1><br>
+        <table id="chart_legend">
+            <tr>
+                <td class="legend_colour conservative">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Conservative</td>
+            </tr>
+            <tr>
+                <td class="legend_colour ndp">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>NDP</td>
+            </tr>
+            <tr>
+                <td class="legend_colour liberals">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Liberals</td>
+            </tr>
 
-<svg id="chart1" class="chart"></svg>
-<svg id="chart2" class="chart"></svg>
+            <tr>
+                <td class="legend_colour greenparty">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Green Party</td>
+            </tr>
+            <tr>
+                <td class="legend_colour bloc">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Bloc Quebecois</td>
+            </tr>
+            <tr>
+                <td class="legend_colour other">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Other</td>
+            </tr>
+        </table>
+    </div>
 
-<span id="billnumber"></span>
-<span id="desctext"></span>
-<span id="summarytext"></span>
+</div>
 
       </div>
 
       <div class="row canyon" id="representation" style="padding: 70px; font-size: 130%;">
-            <a class="anchor" name="representation"></a>
-            <p>What is proportional representation?</p>
-            <p>Proportional representation is an electoral system where each party gains seats in the parliament in proportion to the vote they receive. In simple proportional representation, a party that receives 10% of the vote gains 10% of the seats. By contrast, in the first-past-the-post system it is possible for a party to win more (or less) seats than the percentage of the vote they receive. In the 2011 federal elections, for example, the Conservative party won 54% of the seats despite having only 40% of the popular vote.</p>
-            <p>Would you like to know more? Please see our <a href="https://github.com/CODE2015-WeLikeToSleep/CODE2015/blob/master/README.md">README document.</a></p>
+        <a class="anchor" name="representation"></a>
+        <p>Proportional representation is a system used to elect a country's government. If proportional representation is used in an election, a political party that wins 10% of the vote, will win 10% of the seats in parliament and a party that wins 20% of the vote, will win 20% of the seats.</p>
+
+        <p>If a party wins over 50% of the vote, it wins over 50% of the seats and can form a government, however this does not happen very often because most countries have lots of different political parties. If no party wins over 50% of the vote, then a coalition government usually has to be formed, where a government is formed from two or more different political parties, who together have over 50% of the seats in parliament.</p>
+
+        <p>Source: <a style="color: skyblue;" href="http://simple.wikipedia.org/wiki/Proportional_representation">Proportional Representation on Wikipedia</a></p>
       </div>
 
       <div class="" id="aboutCODE">
@@ -139,24 +214,11 @@ Vote
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script src="http://d3js.org/d3.v3.js"></script>
+<script src="d3.v3.js"></script>
 <script src="Model.ChamberVoteDetail.js"></script>
 <script src="Model.Parliament.js"></script>
 <script src="voting.js"></script>
 <script>
-
-billSummaries = {
-    '41.2.371': 'This enactment provides that the Minister of Health must<br> (a) in consultation with the Minister of the Environment, the provincial ministers responsible for health and with representatives of municipalities, establish a national strategy to reduce the effects of urban heat islands; and \n (b) table a report in the House of Commons on the implementation of this Act that sets out the results of the efforts to reduce the effects of urban heat islands.',
-    '41.2.61': 'This enactment amends the Department of Health Act to oblige drug suppliers to advise the Minister of any interruption or cessation of the production, distribution or importation of drugs and to oblige the Minister to prepare and implement an emergency response plan to address shortages of drugs',
-    '39.1.164': 'This enactment extends the maximum period for which benefits for illness, injury or quarantine may be paid from fifteen weeks to fifty weeks.',
-    '39.2.29': 'The purpose of this enactment is to require alcoholic beverages to bear a warning regarding the effects of alcohol on the ability to operate vehicles and machinery and on the health of the consumer, and regarding the possibility of birth defects when consumed during pregnancy.',
-    '41.1.515': 'This enactment amends the Patent Act to make it easier to manufacture and export pharmaceutical products to address public health problems afflicting many developing and least-developed countries, especially those resulting from HIV/AIDS, tuberculosis, malaria and other epidemics.',
-    '39.1.61': 'This enactment specifies the type of information that is to be provided on the labels of imported and prepackaged food and food sold for immediate consumption.',
-    '40.3.76': 'This enactment establishes the Canadian Environmental Bill of Rights whose provisions apply to all decisions emanating from a federal source or related to federal land, aboriginal land or a federal work or undertaking. The purpose of this enactment is to<br>(a) safeguard the right of present and future generations of Canadians to a healthy and ecologically balanced environment;<br> (b) confirm the Government of Canada’s public trust duty to protect the environment under its jurisdiction;<br> (c) ensure all Canadians have access to adequate environmental information, justice in an environmental context and effective mechanisms for participating in environmental decision-making;\n (d) provide adequate legal protection against reprisals for employees who take action for the purpose of protecting the environment; and<br> (e) enhance the public confidence in the implementation of environmental law.',
-    '41.1.172': 'This enactment prohibits the removal of water in bulk from major drainage basins in Canada.',
-    '41.1.742': 'This enactment addresses health and safety issues on reserve lands and certain other lands by providing for regulations to govern drinking water and waste water treatment in First Nations communities. Regulations could be made on a province-by-province basis to mirror existing provincial regulatory regimes, with adaptations to address the circumstances of First Nations living on those lands.'
-}
-
 function populateVoteListing(parliament, session) {
   function doPopulateVoteListing(voteListing) {
     $('#votelist').empty();
@@ -194,24 +256,22 @@ function populateCharts(parliament, session, vote) {
   var chamberVote = new ChamberVoteDetail(parliament, session, vote);
 
   // TODO: populate extra details from vote listing cache, or from the database
-  //chamberVote.description = 'description';
-  //chamberVote.bill = 'bill';
+  chamberVote.description = 'description';
+  chamberVote.bill = 'bill';
 
-  chamberVote.fetchAsync(function(voteObject){
-    var rescaledVote = voteObject.newScaledVote(alternateParliament);
-    renderPieVoteSummary('#chart1', voteObject, false);
+  chamberVote.fetchAsync(function(vote){
+    var rescaledVote = vote.newScaledVote(alternateParliament);
+    renderPieVoteSummary('#chart1', vote, false);
     renderPieVoteSummary('#chart2', rescaledVote, true);
 
     // TODO: also render the full elected parliament
     // maybe concentric rings could work for this?
-    var pTest = voteObject.getParliamentToday();
+    var pTest = vote.getParliamentToday();
     renderParliament('#parlchart1', pTest);
     renderParliament('#parlchart2', alternateParliament);
-    //renderParliamentComparison('#parlchart1', pTest, alternateParliament);
 
-    $('#desctext').text(voteObject.description || '');
-    $('#billnumber').text(voteObject.bill || '');
-    $('#summarytext').text(billSummaries[parliament+'.'+session+'.'+vote] || '');
+    $('#desctext').text(vote.description);
+    $('#bill_name').text(vote.bill);
   });
 
   window.history.pushState({},"TITLE_NOT_IMPL", document.URL.replace(/#.*$/, "") + '#browse/'+parliament+'/'+session+'/'+vote);
