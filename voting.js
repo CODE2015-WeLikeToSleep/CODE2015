@@ -16,22 +16,18 @@ partySortIndex = {
 }
 
 partyColours = {
-	'NDP.YEA': '#FF6600',
-	'NDP.NAY': '#DDDDDD',
-	'Liberal.YEA': '#DB0B27',
-	'Liberal.NAY': '#DDDDDD',
-	'Conservative.YEA': '#144897',
-	'Conservative.NAY': '#DDDDDD',
-	'Green Party.YEA': '#2D9C44',
-	'Green Party.NAY': '#DDDDDD',
-	'Bloc Québécois.YEA': '#0998F8',
-	'Bloc Québécois.NAY': '#DDDDDD',
-	'Forces et Démocratie.YEA': 'red',
-	'Forces et Démocratie.NAY': '#DDDDDD',
-	'Conservative Independent.YEA': '#144897',
-	'Conservative Independent.NAY': '#DDDDDD',
-	'Independent.YEA': 'yellow',
-	'Independent.NAY': '#DDDDDD'
+	'ndp.YEA': '#FF6600',
+	'ndp.NAY': '#DDDDDD',
+	'liberal.YEA': '#DB0B27',
+	'liberal.NAY': '#DDDDDD',
+	'conservative.YEA': '#144897',
+	'conservative.NAY': '#DDDDDD',
+	'green party.YEA': '#2D9C44',
+	'green party.NAY': '#DDDDDD',
+	'bloc quebecois.YEA': '#0998F8',
+	'bloc quebecois.NAY': '#DDDDDD',
+	'other.YEA': '#144897',
+	'other.NAY': '#DDDDDD',
 };
 
 // TODO add function comment
@@ -180,12 +176,10 @@ function renderParliament(elementSelector, parliament) {
 // system to the per-riding elections data (will be obtained elsewhere).
 var alternateParliament = new Parliament();
 alternateParliament.parties = {
-	'Forces et Démocratie': {seats: 0},
-	'Bloc Québécois': {seats: 6},
-	'Conservative': {seats: 139},
-	'Conservative Independent': {seats: 8},
-	'Green Party': {seats: 8},
-	'Independent': {seats: 14},
-	'Liberal': {seats: 44},
-	'NDP': {seats: 108}
+	'bloc quebecois': {seats: 6},
+	'conservative': {seats: 139},
+	'green party': {seats: 8},
+	'other': {seats: 14},
+	'liberal': {seats: 44},
+	'ndp': {seats: 108}
 };
