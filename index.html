@@ -79,8 +79,6 @@
 <svg id="parlchart2" class="chart"></svg>
 </div>
 
-<span id="desctext"></span>
-
 Parliament/Session
 <select id="parl_session">
   <option value="41,2">41st Parliament, 2nd Session</option>
@@ -103,6 +101,9 @@ Vote
 
 <svg id="chart1" class="chart"></svg>
 <svg id="chart2" class="chart"></svg>
+
+<span id="desctext"></span>
+<span id="summarytext"></span>
 
       </div>
 
@@ -202,6 +203,7 @@ function populateCharts(parliament, session, vote) {
     renderParliament('#parlchart2', alternateParliament);
 
     $('#desctext').text(vote.description);
+    $('#summarytext').text(billSummaries[parliament+'.'+session+'.'+vote]);
   });
 
   window.history.pushState({},"TITLE_NOT_IMPL", document.URL.replace(/#.*$/, "") + '#browse/'+parliament+'/'+session+'/'+vote);
