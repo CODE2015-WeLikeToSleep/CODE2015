@@ -1,3 +1,6 @@
+# Healthy voting
+This app uses federal elections data from the past three elections to construct alternative parliaments based on proportional representation. We also look at how these alternative governments would have voted compared to the actual parliament, with an emphasis on bills related to health.
+
 ### If you'd like to know more ...
 
 ##### How are alternative parliaments calculated in this app?
