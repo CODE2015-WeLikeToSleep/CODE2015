@@ -54,6 +54,7 @@ ChamberVoteDetail.prototype.fetchAsync = function(callback) {
 			self.decision = dataJSON.decision;
 			self.date = dataJSON.date;
 			self.description = dataJSON.title;
+			self.bill = dataJSON.bill;
 			dataJSON.details.forEach(function(value,ix,array){
 				self.votes.push(new PartyVoteCount(value.party,VoteType.YEA,value['yea']));
 				self.votes.push(new PartyVoteCount(value.party,VoteType.NAY,value['nay']));
