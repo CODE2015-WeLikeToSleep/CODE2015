@@ -72,10 +72,10 @@ function fetchParliamentByYear(method, year, callback) {
 				var allMethodResults = {};
 				allMethodResults[ElectoralMethod.FPTP] = value.fptp;
 				allMethodResults[ElectoralMethod.PR] = value.pr;
-				parliament.parties.push({
+				parliament.parties[partyName] = {
 					party: partyName,
 					seats: allMethodResults[method]
-				});
+				};
 			});
 			callback(parliament);
 		}
