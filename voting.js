@@ -227,7 +227,6 @@ function renderPieVoteSummary(elementSelector, voteSummary) {
 		.outerRadius(radius);
 
 	var pie = d3.layout.pie()
-		.startAngle(45)
 		.value(function(d) { return d.count; })
 		.sort(null);
 
