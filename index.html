@@ -10,7 +10,8 @@
     <title>Healthy Voting</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
         <link href="carousel.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootswatch/3.2.0/cerulean/bootstrap.min.css">
+    <link rel="stylesheet" href="css/parliament.css">
     <style type="text/css">
     html {
       margin: 0;
@@ -112,32 +113,104 @@
 <svg id="parlchart2" class="chart"></svg>
 </div>
 
-Parliament/Session
-<select id="parl_session">
-  <option value="41,2">41st Parliament, 2nd Session</option>
-  <option value="41,1">41st Parliament, 1st Session</option>
-  <option value="40,3">40th Parliament, 3rd Session</option>
-  <option value="40,2">40th Parliament, 2nd Session</option>
-  <!-- the 40th parliament, 1st session is dumb and has no real bills. -->
-  <!--<option value="40,1">40th Parliament, 1st Session</option>-->
-  <option value="39,2">39th Parliament, 2nd Session</option>
-  <option value="39,1">39th Parliament, 1st Session</option>
-</select>
+<div id="parl_wrapper">
 
-Vote
-<select id="votelist">
-</select>
-<a id="lnkPrev" href="#">Previous</a>
-<a id="lnkNext" href="#">Next</a>
+    <div>
+        <h1>Parliament/Session</h1>
+        <select id="parl_session" onchange="setDuration(this.options[this.selectedIndex].value)">
+            <option value="41,2">41st Parliament, 2nd Session</option>
+            <option value="41,1">41st Parliament, 1st Session</option>
+            <option value="40,3">40th Parliament, 3rd Session</option>
+            <option value="40,2">40th Parliament, 2nd Session</option>
+            <!-- the 40th parliament, 1st session is dumb and has no real bills. -->
+            <!--<option value="40,1">40th Parliament, 1st Session</option>-->
+            <option value="39,2">39th Parliament, 2nd Session</option>
+            <option value="39,1">39th Parliament, 1st Session</option>
+        </select>
+    </div>
+
+    <script>
+        function setDuration(s) {
+
+            dur = ""
+
+            switch (s) {
+                case "41,2":
+                    dur = "2013.10.16 - 2015.02.19";
+                    break;
+                case "41,1":
+                    dur = "2011.06.02 - 2013.09.13";
+                    break;
+                case "40,3":
+                    dur = "2010.03.03 - 2011.03.25";
+                    break;
+                case "40,2":
+                    dur = "2009.01.26 - 2009.12.30";
+                    break;
+                case "39,2":
+                    dur = "2007.10.16 - 2008.06.20";
+                    break;
+                case "39,1":
+                    dur = "2006.04.03 - 2007.09.14";
+                    break;
+            }
+
+            $('#parl_duration').text(dur);
+        }
+    </script>
+
+    <h1>Duration: </h1> <div id="parl_duration"></div><br>
+
+</div>
+
+<div id="vote_wrapper">
+    <h1>Vote: </h1><a id="lnkPrev" href="#">&#8656; </a><select id="votelist"></select><a id="lnkNext" href="#"> &#8658;</a><br>
+    <h1>Bill: </h1><span id="bill_name"></span><br>
+    <h1>Title: </h1><span id="desctext"></span><br>
+</div>
 
 <br>
+<div id="vote_chart_wrapper">
+    <div class="vote_chart">
+        <h1>First Past the Post</h1><br>
+        <svg id="chart1" class="chart"></svg>
+    </div>
+    <div class="vote_chart">
+        <h1>Proportional Representation</h1><br>
+        <svg id="chart2" class="chart"></svg>
+    </div>
+    <div class="vote_chart" style="text-align: left;">
+        <h1 style="text-align:left;">Legend</h1><br>
+        <table id="chart_legend">
+            <tr>
+                <td class="legend_colour conservative">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Conservative</td>
+            </tr>
+            <tr>
+                <td class="legend_colour ndp">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>NDP</td>
+            </tr>
+            <tr>
+                <td class="legend_colour liberals">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Liberals</td>
+            </tr>
 
-<svg id="chart1" class="chart"></svg>
-<svg id="chart2" class="chart"></svg>
+            <tr>
+                <td class="legend_colour greenparty">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Green Party</td>
+            </tr>
+            <tr>
+                <td class="legend_colour bloc">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Bloc Quebecois</td>
+            </tr>
+            <tr>
+                <td class="legend_colour other">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td>Other</td>
+            </tr>
+        </table>
+    </div>
 
-<span id="billnumber"></span>
-<span id="desctext"></span>
-<span id="summarytext"></span>
+</div>
 
       </div>
 
@@ -243,24 +316,22 @@ function populateCharts(parliament, session, vote) {
   var chamberVote = new ChamberVoteDetail(parliament, session, vote);
 
   // TODO: populate extra details from vote listing cache, or from the database
-  //chamberVote.description = 'description';
-  //chamberVote.bill = 'bill';
+  chamberVote.description = 'description';
+  chamberVote.bill = 'bill';
 
-  chamberVote.fetchAsync(function(voteObject){
-    var rescaledVote = voteObject.newScaledVote(alternateParliament);
-    renderPieVoteSummary('#chart1', voteObject, false);
+  chamberVote.fetchAsync(function(vote){
+    var rescaledVote = vote.newScaledVote(alternateParliament);
+    renderPieVoteSummary('#chart1', vote, false);
     renderPieVoteSummary('#chart2', rescaledVote, true);
 
     // TODO: also render the full elected parliament
     // maybe concentric rings could work for this?
-    var pTest = voteObject.getParliamentToday();
+    var pTest = vote.getParliamentToday();
     renderParliament('#parlchart1', pTest);
     renderParliament('#parlchart2', alternateParliament);
-    //renderParliamentComparison('#parlchart1', pTest, alternateParliament);
 
-    $('#desctext').text(voteObject.description || '');
-    $('#billnumber').text(voteObject.bill || '');
-    $('#summarytext').text(billSummaries[parliament+'.'+session+'.'+vote] || '');
+    $('#desctext').text(vote.description);
+    $('#bill_name').text(vote.bill);
   });
 
   var browseHash = parliament+'/'+session+'/'+vote;
