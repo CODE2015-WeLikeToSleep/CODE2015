@@ -22,7 +22,8 @@ Parliament.prototype.appendRatios = function appendParliamentRatios(parliament) 
 		}
 		goodParties.push(party);
 	}
-	for (party in goodParties) {
+	goodParties.forEach(function(value,ix,array){
+		var party = value;
 		this.parties[party]['influence'] = this.parties[party]['seats'] / totalSeats;
-	}
+	});
 }
