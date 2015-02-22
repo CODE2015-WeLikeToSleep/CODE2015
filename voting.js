@@ -24,7 +24,7 @@ partyColours = {
 	'green party.NAY': '#DDDDDD',
 	'bloc quebecois.YEA': '#0998F8',
 	'bloc quebecois.NAY': '#DDDDDD',
-	'other.YEA': '#144897',
+	'other.YEA': 'purple',
 	'other.NAY': '#DDDDDD',
 };
 
@@ -197,6 +197,11 @@ function renderParliament(elementSelector, parliament) {
 
 	var width = 200;
 	var height = 200;
+	var barwidth = 20;
+
+	var y = d3.scale.linear()
+	    .domain([0, d3.max(chartData, function(v){return v.seats})])
+	    .range([0, height]);
 
 	var svg = d3.select(elementSelector)
 		.attr("width", width)
@@ -206,11 +211,12 @@ function renderParliament(elementSelector, parliament) {
 		.data(chartData)
 		.enter()
 		.append('rect')
-		.attr('transform', function(d, i) { return "translate(0," + i * 10 + ")"; })
-		.attr('x', 0)
-		.attr('width', function(d,i){return d.seats;})
-		.attr('height', 10)
 		.attr('class', 'rectclass')
+		.attr('transform', function(d, i) { return "translate(" + i * barwidth + ",0)"; })
+		.attr('x', 0)
+		.attr('y', function(d){return height-y(d.seats)} )
+		.attr('width', barwidth)
+		.attr('height', function(d){return y(d.seats)} )
 		.attr('fill', function(d,i){return partyColours[d.party+'.YEA'];});
 }
 

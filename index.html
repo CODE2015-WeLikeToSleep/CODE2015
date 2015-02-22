@@ -207,9 +207,9 @@ function populateCharts(parliament, session, vote) {
     // TODO: also render the full elected parliament
     // maybe concentric rings could work for this?
     var pTest = voteObject.getParliamentToday();
-    //renderParliament('#parlchart1', pTest);
-    //renderParliament('#parlchart2', alternateParliament);
-    renderParliamentComparison('#parlchart1', pTest, alternateParliament);
+    renderParliament('#parlchart1', pTest);
+    renderParliament('#parlchart2', alternateParliament);
+    //renderParliamentComparison('#parlchart1', pTest, alternateParliament);
 
     $('#desctext').text(voteObject.description || '');
     $('#billnumber').text(voteObject.bill || '');
