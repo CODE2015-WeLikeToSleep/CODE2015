@@ -1,5 +1,5 @@
-<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 <?php
+header('Content-Type: application/json; charset=UTF-8');
 
 // TODO: get as input
 if (!(isset($_GET["p"]) and isset($_GET["s"]) and isset($_GET["v"]))) {
