@@ -10,7 +10,7 @@ if ($mysqli->connect_errno) {
 }
 
 /* Prepared statement, stage 1: prepare */
-if (!($stmt = $mysqli->prepare("SELECT Party, ActualSeats, PRSeats, VoteCount FROM seatdistribution WHERE ElectYear=?"))) {
+if (!($stmt = $mysqli->prepare("SELECT Party, ActualSeats, PRSeats, VoteCount FROM seat_distribution WHERE ElectYear=?"))) {
     echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 }
 
