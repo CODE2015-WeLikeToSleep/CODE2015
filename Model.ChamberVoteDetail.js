@@ -51,9 +51,9 @@ ChamberVoteDetail.prototype.fetchAsync = function(callback) {
 		dataType: 'json',
 		url: 'votedata.php?p='+this.nthParliament+'&s='+this.nthSession+'&v='+this.nthVote,
 		success: function(dataJSON){
-			this.decision = dataJSON.decision;
-			this.date = dataJSON.date;
-			this.description = dataJSON.title;
+			self.decision = dataJSON.decision;
+			self.date = dataJSON.date;
+			self.description = dataJSON.title;
 			dataJSON.details.forEach(function(value,ix,array){
 				self.votes.push(new PartyVoteCount(value.party,VoteType.YEA,value['yea']));
 				self.votes.push(new PartyVoteCount(value.party,VoteType.NAY,value['nay']));
