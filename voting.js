@@ -258,3 +258,6 @@ alternateParliament.parties = {
 fetchParliamentByNumber(ElectoralMethod.FPTP,41,function(value){
 	console.log(value);
 });
+fetchParliamentByNumber(ElectoralMethod.PR,41,function(value){
+	console.log(value);
+});
