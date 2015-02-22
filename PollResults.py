@@ -24,8 +24,8 @@ resultURLs = {
 
 def processElectionURL(electYear, url):
 
-    fileName = os.path.dirname(sys.argv[0]) + "/" + str(electYear) + ".zip"
-    tmpPath = os.path.dirname(sys.argv[0]) + "/tmp/"
+    fileName = "/home/code2015/CODE2015/" + str(electYear) + ".zip"
+    tmpPath = "/home/code2015/CODE2015/tmp/"
 
 
     urllib.URLopener().retrieve(url, fileName)
