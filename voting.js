@@ -30,6 +30,8 @@ partyColours = {
 
 // TODO add function comment
 function voteListingFromXml(xmlVoteListing) {
+	var noDupes = true;
+	var dupeFinder = {};
 	var data = [];
 	var detailResource='http://www.parl.gc.ca/HouseChamberBusiness/Chambervotedetail.aspx';
 	$(xmlVoteListing).find('Votes').each(function(){
@@ -53,6 +55,14 @@ function voteListingFromXml(xmlVoteListing) {
 			// we only care about votes on bills!
 			// TODO: maybe we only care about the most recent bill?
 			if (vote.bill == null) {return;}
+
+			if (noDupes) {
+				billNo = $(this).find('RelatedBill').attr('number');
+				if (typeof dupeFinder[billNo] != 'undefined') {
+					return;
+				}
+				dupeFinder[billNo] = true;
+			}
 
 			data.push(vote);
 		});
