@@ -11,15 +11,18 @@ function Parliament() {
  */
 Parliament.prototype.appendRatios = function appendParliamentRatios(parliament) {
 	var totalSeats = 0;
+	var goodParties = [];
 	for (party in this.parties) {
 		var seats = this.parties[party]['seats'];
 		if (seats > 0) {
 			totalSeats += seats;
 		} else {
 			console.log('TODO: How do I throw a NaN exception?');
+			continue;
 		}
+		goodParties.push(party);
 	}
-	for (party in this.parties) {
+	for (party in goodParties) {
 		this.parties[party]['influence'] = this.parties[party]['seats'] / totalSeats;
 	}
 }
