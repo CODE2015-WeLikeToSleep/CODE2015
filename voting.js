@@ -218,6 +218,18 @@ function renderParliament(elementSelector, parliament) {
 		.attr('width', barwidth)
 		.attr('height', function(d){return y(d.seats)} )
 		.attr('fill', function(d,i){return partyColours[d.party+'.YEA'];});
+
+	var text = svg.selectAll('text')
+		.data(chartData)
+		.enter()
+		.append('text')
+		.text(function(d,i){return d.party})
+		.attr('transform', function(d, i) { return "rotate(-90)"; })
+		//.attr('x', function(d,i){return i*barwidth;})
+		// .attr('y', function(d,i){return height-y(d.seats)} )
+		.attr('dx', -100)
+		.attr('dy', function(d,i){return 15+i*barwidth})
+		.attr('fill', 'black');
 }
 
 // Right now, this alternate parliament is completely imaginary.
